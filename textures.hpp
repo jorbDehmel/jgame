@@ -1,6 +1,8 @@
 #ifndef TEXTURES_H
 #define TEXTURES_H
 
+#include <iostream>
+#include <cassert>
 #include "stage.hpp"
 
 /////////////////////////////////////
@@ -206,6 +208,10 @@ void stamp(Sprite *sprite, SDL_Surface *onto) {
     }
     return;
 }
+
+/////////////////////////////////////
+
+// transform
 
 /////////////////////////////////////
 

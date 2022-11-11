@@ -28,6 +28,29 @@ public:
 
     ~SmartSprite();
 
+    inline int X() const { return *x; }
+    inline int Y() const { return *y; }
+    inline void X(int t) { *x = t; }
+    inline void Y(int t) { *y = t; }
+    inline Uint8 L() const { return *layer; }
+    inline void L(int t) { if (t > 0) *layer = t; }
+
+    inline void xInc(int t = 1) { (*x) += t; }
+    inline void yInc(int t = 1) { (*x) += t; }
+    inline void lInc(int t = 1) { (*layer) += t; }
+
+    inline int frame() const { return curFrame; };
+    inline void frame(int t) {
+        if (t > 0 && t < numFrames) {
+            curFrame = t;
+            surface = frames[curFrame];
+        }
+    };
+    inline void incFrame(int t = 1) {
+        curFrame = ((int)curFrame + t) % numFrames;
+        surface = frames[curFrame];
+    }
+
     Uint8 numFrames;
     Uint8 curFrame;
     SDL_Surface **frames;
