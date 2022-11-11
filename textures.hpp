@@ -4,77 +4,37 @@
 #include <iostream>
 #include <cassert>
 #include "stage.hpp"
+#include <regex>
 
 /////////////////////////////////////
 
+void upScale(SDL_Surface *&s, Uint8 scale) {
+    SDL_Surface *hi = SDL_CreateRGBSurface(0, s->w * scale, s->h * scale, BITDEPTH, 0, 0, 0, 0);
+    SDL_BlitScaled(s, NULL, hi, NULL);
+    SDL_FreeSurface(s);
+    s = hi;
+    return;
+}
+
 // Load a texture from a file to a sprite in memory
 void loadTexture(Sprite *s, const char *path, int scale = 1) {
-    std::ifstream in;
-
-    in.open(path);
-    if (!in.is_open()) throw std::runtime_error("Failed to open texture");
-    
-    int format, h, w, bd;
-    PIXEL_TYPE temp;
-
-    //in >> format >> w >> h >> bd;
-    in.read(reinterpret_cast<char*>(&format), sizeof(format));
-    in.read(reinterpret_cast<char*>(&w), sizeof(w));
-    in.read(reinterpret_cast<char*>(&h), sizeof(h));
-    in.read(reinterpret_cast<char*>(&bd), sizeof(bd));
-
-    if (bd != BITDEPTH) {
-        throw std::runtime_error("Invalid texture!");
+    if (std::regex_match(path, std::regex(".*\\.bmp"))) {
+        SDL_Surface *out = SDL_LoadBMP(path);
+        upScale(out, scale);
+        s->surface = out;
+        return;
     }
-
-    s->surface = SDL_CreateRGBSurface(0, w * scale, h * scale, BITDEPTH, 0, 0, 0, 0);
-    PIXEL_TYPE *pixels = (PIXEL_TYPE*)s->surface->pixels;
-
-    int num;
-    switch (format) {
-    case 0: // compressionless
-        for (int r = 0; r < h; r++) {
-            for (int c = 0; c < w; c++) {
-                in.read(reinterpret_cast<char*>(&temp), sizeof(temp));
-                for (int j = 0; j < scale; j++) {
-                    for (int k = 0; k < scale; k++) {
-                        pixels[((r * scale) * (w * scale)) + (j * w * scale) + (c * scale) + k] = temp;
-                    }
-                }
-            }
-        }
-        break;
-    case 1: // basic compression
-        num = 0;
-        for (int r = 0; r < h; r++) {
-            for (int c = 0; c < w; c++) {
-                if (num <= 0) {
-                    in.read(reinterpret_cast<char*>(&num), sizeof(num));
-                    in.read(reinterpret_cast<char*>(&temp), sizeof(temp));
-                }
-                for (int j = 0; j < scale; j++) {
-                    for (int k = 0; k < scale; k++) {
-                        pixels[((r * scale) * (w * scale)) + (j * w * scale) + (c * scale) + k] = temp;
-                    }
-                }
-                num--;
-            }
-        }
-        
-        break;
-    default:
-        throw std::runtime_error("Unrecognized filetype");
-        break;
-    };
-
-    in.close();
-
-    return;
 }
 
 /////////////////////////////////////
 
 SDL_Surface *loadTexture(const char *path, int scale = 1) {
+    if (std::regex_match(path, std::regex(".*\\.bmp"))) {
+        SDL_Surface *out = SDL_LoadBMP(path);
+        upScale(out, scale);
+        return out;
+    }
+
     std::ifstream in;
 
     in.open(path);
@@ -211,7 +171,29 @@ void stamp(Sprite *sprite, SDL_Surface *onto) {
 
 /////////////////////////////////////
 
-// transform
+void invertX(SDL_Surface *s) {
+    PIXEL_TYPE temp, *pixels;
+    pixels = (PIXEL_TYPE*)s->pixels;
+    for (int y = 0; y < s->h; y++) {
+        for (int x = 0; x < (s->w - x); x++) {
+            temp = pixels[(y * s->w) + x];
+            pixels[(y * s->w) + x] = pixels[(y * s->w) + (s->w - x)];
+            pixels[(y * s->w) + (s->w - x)] = temp;
+        }
+    }
+}
+
+void invertY(SDL_Surface *s) {
+    PIXEL_TYPE temp, *pixels;
+    pixels = (PIXEL_TYPE*)s->pixels;
+    for (int x = 0; x < s->h; x++) {
+        for (int y = 0; y < (s->h - y); y++) {
+            temp = pixels[(y * s->w) + x];
+            pixels[(y * s->w) + x] = pixels[((s->h - y) * s->w) + x];
+            pixels[((s->h - y) * s->w) + x] = temp;
+        }
+    }
+}
 
 /////////////////////////////////////
 

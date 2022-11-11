@@ -22,8 +22,6 @@ char *concat(const char a[], char *b) {
 class SmartSprite: public Sprite {
 public:
     SmartSprite(Uint8 numF, SDL_Surface **s, int x = 0, int y = 0, Uint8 l = 0, SPRITE_TYPE t = PLAYER);
-    SmartSprite(Uint8 numF, char **paths, int x = 0, int y = 0, Uint8 l = 0, Uint8 scale = 1, SPRITE_TYPE t = PLAYER);
-    SmartSprite(char *path, int x = 0, int y = 0, Uint8 l = 0, Uint8 scale = 1, SPRITE_TYPE t = PLAYER);
     SmartSprite(Uint8 numF, char *folder, int x = 0, int y = 0, Uint8 l = 0, Uint8 scale = 1, SPRITE_TYPE t = PLAYER);
 
     ~SmartSprite();
@@ -73,25 +71,6 @@ SmartSprite::SmartSprite(Uint8 numF, SDL_Surface **s, int x, int y, Uint8 l, SPR
     this->surface = frames[curFrame];
 }
 
-SmartSprite::SmartSprite(Uint8 numF, char **paths, int x, int y, Uint8 l, Uint8 scale, SPRITE_TYPE t) {
-    numFrames = numF;
-    frames = new SDL_Surface*[numFrames];
-    for (int i = 0; i < numFrames; i++) {
-        frames[i] = loadTexture(paths[i], scale);
-    }
-    curFrame = 0;
-    type = t;
-
-    this->x = new int(x);
-    this->y = new int(y);
-    this->layer = new Uint8(l);
-    this->surface = frames[curFrame];
-}
-
-SmartSprite::SmartSprite(char *path, int x, int y, Uint8 l, Uint8 scale, SPRITE_TYPE t) {
-    SmartSprite(1, &path, y, x, l, scale, t);
-}
-
 SmartSprite::SmartSprite(Uint8 numF, char *folder, int x, int y, Uint8 l, Uint8 scale, SPRITE_TYPE t) {
     char **paths = new char*[numF];
 
@@ -107,12 +86,13 @@ SmartSprite::SmartSprite(Uint8 numF, char *folder, int x, int y, Uint8 l, Uint8 
         in.getline(paths[i], 64);
     }
     in.close();
-    system("rm -f toload.temp");
+    //system("rm -f toload.temp");
 
     numFrames = numF;
     frames = new SDL_Surface*[numF];
-    for (int i = 0; i < numFrames; i++) {
-        frames[i] = loadTexture(concat(concat(folder, (char*)"/"), paths[i]), scale);
+    for (int i = 0; i < numF; i++) {
+        frames[i] = SDL_LoadBMP(concat(concat(folder, (char*)"/"), paths[i]));    //loadTexture(concat(concat(folder, (char*)"/"), paths[i]), scale);
+        upScale(frames[i], scale);
     }
     curFrame = 0;
     type = t;
