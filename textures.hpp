@@ -8,6 +8,8 @@
 
 /////////////////////////////////////
 
+// Upscale a surface s such that its pointer now points to a surface
+// scale times larger along each axis
 void upScale(SDL_Surface *&s, Uint8 scale) {
     SDL_Surface *hi = SDL_CreateRGBSurface(0, s->w * scale, s->h * scale, BITDEPTH, 0, 0, 0, 0);
     SDL_BlitScaled(s, NULL, hi, NULL);
@@ -22,8 +24,10 @@ void loadTexture(Sprite *s, const char *path, int scale = 1) {
         SDL_Surface *out = SDL_LoadBMP(path);
         upScale(out, scale);
         s->surface = out;
-        return;
+    } else {
+        throw std::runtime_error("Unrecognized filetype; cannot load texture");
     }
+    return;
 }
 
 /////////////////////////////////////
@@ -33,9 +37,11 @@ SDL_Surface *loadTexture(const char *path, int scale = 1) {
         SDL_Surface *out = SDL_LoadBMP(path);
         upScale(out, scale);
         return out;
+    } else {
+        throw std::runtime_error("Unrecognized filetype; cannot load texture");
     }
 
-    std::ifstream in;
+    /*std::ifstream in;
 
     in.open(path);
     if (!in.is_open()) {
@@ -102,11 +108,13 @@ SDL_Surface *loadTexture(const char *path, int scale = 1) {
 
     in.close();
 
-    return s;
+    return s;*/
 }
 
 /////////////////////////////////////
 
+// Tile a surface <into> with the contents of surface <from>
+// such that <from>'s pattern is repeated across <into>
 void tile(SDL_Surface *from, SDL_Surface *into) {
     PIXEL_TYPE *sourcePixels = (PIXEL_TYPE*)from->pixels;
     PIXEL_TYPE *pixels = (PIXEL_TYPE*)into->pixels;
@@ -132,12 +140,14 @@ void tile(SDL_Surface *from, SDL_Surface *into) {
     return;
 }
 
+// Tile with a scaling aspect on the <from> surface
 void tile(SDL_Surface *into, char *path, int scale) {
     SDL_Surface *from = loadTexture(path, scale);
     tile(from, into);
     return;
 }
 
+// Tile from a path, returning a newly created surface
 SDL_Surface *tile(int w, int h, char *path, int scale = 1, Uint8 bd = BITDEPTH) {
     SDL_Surface *temp = SDL_CreateRGBSurface(0, w, h, bd, 0, 0, 0, 0);
     tile(temp, path, scale);
@@ -146,6 +156,7 @@ SDL_Surface *tile(int w, int h, char *path, int scale = 1, Uint8 bd = BITDEPTH) 
 
 /////////////////////////////////////
 
+// Stamp a suface <onto> with <sprite> according to its current location
 void stamp(Sprite *sprite, SDL_Surface *onto) {
     int source, destination;
 
@@ -171,6 +182,7 @@ void stamp(Sprite *sprite, SDL_Surface *onto) {
 
 /////////////////////////////////////
 
+// Invert a surface's pixels such that its left is now its right
 void invertX(SDL_Surface *s) {
     PIXEL_TYPE temp, *pixels;
     pixels = (PIXEL_TYPE*)s->pixels;
@@ -183,6 +195,7 @@ void invertX(SDL_Surface *s) {
     }
 }
 
+// Invert a surface's pixels such that its top is now its bottom
 void invertY(SDL_Surface *s) {
     PIXEL_TYPE temp, *pixels;
     pixels = (PIXEL_TYPE*)s->pixels;

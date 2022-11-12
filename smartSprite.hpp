@@ -5,6 +5,7 @@
 
 /////////////////////////////////////
 
+// Concatenate two string literals
 char *concat(const char a[], char *b) {
     int sizeA = 0; while (a[sizeA] != '\0') sizeA++;
     int sizeB = 0; while (b[sizeB] != '\0') sizeB++;
@@ -19,6 +20,9 @@ char *concat(const char a[], char *b) {
 
 /////////////////////////////////////
 
+// A slightly improved version of the sprite object
+// Holds its own x, y, and layer rather than holding a pointer.
+// Also able to hold multiple frames and cycle through them.
 class SmartSprite: public Sprite {
 public:
     SmartSprite(Uint8 numF, SDL_Surface **s, int x = 0, int y = 0, Uint8 l = 0, SPRITE_TYPE t = PLAYER);
@@ -34,7 +38,7 @@ public:
     inline void L(int t) { if (t > 0) *layer = t; }
 
     inline void xInc(int t = 1) { (*x) += t; }
-    inline void yInc(int t = 1) { (*x) += t; }
+    inline void yInc(int t = 1) { (*y) += t; }
     inline void lInc(int t = 1) { (*layer) += t; }
 
     inline int frame() const { return curFrame; };
@@ -56,6 +60,7 @@ public:
 
 /////////////////////////////////////
 
+// Initialize a smartSprite from a list of SDL_Surface * frames.
 SmartSprite::SmartSprite(Uint8 numF, SDL_Surface **s, int x, int y, Uint8 l, SPRITE_TYPE t) {
     numFrames = numF;
     frames = new SDL_Surface*[numFrames];
@@ -71,6 +76,7 @@ SmartSprite::SmartSprite(Uint8 numF, SDL_Surface **s, int x, int y, Uint8 l, SPR
     this->surface = frames[curFrame];
 }
 
+// Initialize a smartSprite from a folder path and a number of frames to load.
 SmartSprite::SmartSprite(Uint8 numF, char *folder, int x, int y, Uint8 l, Uint8 scale, SPRITE_TYPE t) {
     char **paths = new char*[numF];
 
@@ -103,6 +109,7 @@ SmartSprite::SmartSprite(Uint8 numF, char *folder, int x, int y, Uint8 l, Uint8 
     this->surface = frames[curFrame];
 }
 
+// Gracefully deallocate all associated memory
 SmartSprite::~SmartSprite() {
     delete x;
     delete y;

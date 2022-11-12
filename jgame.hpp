@@ -8,5 +8,6 @@
 #include "stage.hpp"
 #include "textures.hpp"
 #include "smartSprite.hpp"
+#include "keys.hpp"
 
 #endif

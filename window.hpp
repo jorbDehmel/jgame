@@ -2,10 +2,15 @@
 #define WINDOW_H
 
 #define DEBUG
+#define STEADY_FRAMERATE
 
 #include <SDL2/SDL.h>
 #include <stdexcept>
 #include <bitset>
+
+#ifdef STEADY_FRAMERATE
+    #include <chrono>
+#endif
 
 /////////////////////////////////////
 
@@ -19,8 +24,15 @@ Uint8 MOUSESTATE;
 int MOUSE_X, MOUSE_Y;
 bool ISRUNNING = true;
 
+#ifdef STEADY_FRAMERATE
+    std::chrono::_V2::steady_clock::time_point prev_time, cur_time;
+    int toWait;
+#endif
+
 /////////////////////////////////////
 
+// A window on the screen. Has event handling and automatic frame updating.
+// Optimized for computer use, IE will not work without a keyboard and mouse.
 class Window {
 public:
     Window(Uint16 h, Uint16 w, Uint16 rt, char *t, void (*update)(SDL_Surface *frame),
@@ -45,6 +57,8 @@ public:
 
 /////////////////////////////////////
 
+// Takes height, width, refresh time in milliseconds, window title, 
+// frame updating function by reference, SDL window flag, and bitdepth.
 Window::Window(Uint16 h, Uint16 w, Uint16 rt, char *t, void (*updateFunc)(SDL_Surface *frame),
         SDL_WindowFlags windowFlag = SDL_WINDOW_OPENGL, Uint8 bd = BITDEPTH) {
     
@@ -83,6 +97,8 @@ Window::Window(Uint16 h, Uint16 w, Uint16 rt, char *t, void (*updateFunc)(SDL_Su
     return;
 }
 
+// Transfer any occured mouse movements or keyboard presses to 
+// their associated metavariables
 void Window::scanEvents() {
     // Event handling
     while (SDL_PollEvent(&event)) {
@@ -118,14 +134,31 @@ void Window::scanEvents() {
     return;
 }
 
+// Call the (given at instantiation) update frame function and delay by 
+// the pre-given refresh time.
 void Window::runFrame() {
+    
+
     update(SDL_GetWindowSurface(window));
     SDL_UpdateWindowSurface(window);
-    SDL_Delay(REFRESH_TIME);
     
+    #ifdef STEADY_FRAMERATE
+        cur_time = std::chrono::steady_clock::now();
+        toWait = (REFRESH_TIME - (std::chrono::duration_cast<std::chrono::milliseconds>(cur_time - prev_time).count()));
+        prev_time = cur_time;
+
+        if (toWait > 0 && toWait < REFRESH_TIME) {
+            SDL_Delay(toWait);
+        }
+    #else
+        SDL_Delay(toWait);
+    #endif
+
     return;
 }
 
+// Repeatedly handle events and update the screen until the global ISRUNNING
+// is false. Then, gracefully exit SDL.
 void Window::mainLoop() {
     while (ISRUNNING) {
         scanEvents();
@@ -135,6 +168,7 @@ void Window::mainLoop() {
     return;
 }
 
+// Shutdown SDL
 void Window::kill() {
     SDL_DestroyWindow(window);
     SDL_Quit();

@@ -7,6 +7,7 @@
 
 /////////////////////////////////////
 
+// Tags for sprite types (used in collision detection, etc)
 enum SPRITE_TYPE {
     PLAYER,
     BACKGROUND,
@@ -20,6 +21,8 @@ enum SPRITE_TYPE {
 
 /////////////////////////////////////
 
+// An "actor" on a stage. Has references to x, y, and layer 
+// positions, a "costume" (surface) and a type.
 class Sprite {
 public:
     Sprite();
@@ -36,12 +39,15 @@ public:
     SPRITE_TYPE type;
 };
 
+// Default constructor for inherited classes (DO NOT USE)
 Sprite::Sprite() {
     surface = nullptr;
     x = y = nullptr;
     layer = nullptr;
 }
 
+// Construct a Sprite given a surface (costume) and variables
+// to be associated with x, y, and layer.
 Sprite::Sprite(SDL_Surface *s, int &xIn, int &yIn, Uint8 &l) {
     surface = s;
     x = &xIn;
@@ -49,6 +55,8 @@ Sprite::Sprite(SDL_Surface *s, int &xIn, int &yIn, Uint8 &l) {
     layer = &l;
 }
 
+// Construct a Sprite given a costume and a layer.
+// Variable references are generated within.
 Sprite::Sprite(SDL_Surface *s, Uint8 l) {
     surface = s;
     x = new int(0);
@@ -56,6 +64,7 @@ Sprite::Sprite(SDL_Surface *s, Uint8 l) {
     layer = new Uint8(l);
 }
 
+// Dealloc associated memory
 Sprite::~Sprite() {
     delete x;
     delete y;
@@ -64,6 +73,9 @@ Sprite::~Sprite() {
 
 /////////////////////////////////////
 
+// A simple wrapper object for easier interprettation of
+// the isTouching() function output. Use like: 
+// if (Collision(isTouching(a, b)).top()) {...}
 class Collision {
 public:
     Collision(std::bitset<8> b): col(b) {};
@@ -81,6 +93,8 @@ protected:
     std::bitset<8> col;
 };
 
+// Get analytics on the collisions of sprites a and b
+// (can be easily interpretted using the collision type)
 std::bitset<8> isTouching(Sprite *a, Sprite *b) {
     std::bitset<8> output;
 
@@ -96,6 +110,7 @@ std::bitset<8> isTouching(Sprite *a, Sprite *b) {
     return output;
 }
 
+// Return if a's bounding rectangle collides with b's.
 bool isTouchingVague(Sprite *a, Sprite *b) {
     auto result = isTouching(a, b);
     return result[4] || result[5] || result[6] || result[7];
@@ -103,6 +118,7 @@ bool isTouchingVague(Sprite *a, Sprite *b) {
 
 /////////////////////////////////////
 
+// Return if the mouse falls within an object's bounding rectangle
 bool isMouseWithin(Sprite *a) {
     return (MOUSE_X >= *a->x && MOUSE_X < *a->x + a->surface->w) &&
         (MOUSE_Y >= *a->y && MOUSE_Y < *a->y + a->surface->h);
@@ -110,6 +126,8 @@ bool isMouseWithin(Sprite *a) {
 
 /////////////////////////////////////
 
+// A simple singly-linked-list wrapper for sprites
+// To be used within the Stage class for storing sprites by layer
 struct SpriteNode {
     Sprite *cur;
     SpriteNode *next;
@@ -117,6 +135,9 @@ struct SpriteNode {
 
 /////////////////////////////////////
 
+// A simple handler for rendering many sprites to the screen.
+// Fills with sprites, which are rendered according to their layer
+// when update is called.
 class Stage {
 public:
     Stage(Uint16 height, Uint16 width, Uint8 depth);
@@ -145,6 +166,7 @@ public:
 
 /////////////////////////////////////
 
+// Create an empty stage with the given height, width and depth.
 Stage::Stage(Uint16 height, Uint16 width, Uint8 depth) {
     SPRITES = nullptr;
     h = height;
@@ -154,6 +176,8 @@ Stage::Stage(Uint16 height, Uint16 width, Uint8 depth) {
     return;
 }
 
+// Update a passed frame so that it contains the stage's image
+// (with all sprites rendered from furthest away to closest)
 void Stage::update(SDL_Surface *frame) {
     SDL_LockSurface(frame);
 
@@ -177,6 +201,8 @@ void Stage::update(SDL_Surface *frame) {
 
                 if (c + *sprite->x + 1 > frame->w || c + *sprite->x < 0) continue;
 
+                //if (!sprite->GO_OFFSCREEN) destination %= h * w;
+
                 // Ignore if out of bounds
                 if (destination > 0 && destination < h * w) {
                     // Place pixel (skipping transparency)
@@ -193,6 +219,11 @@ void Stage::update(SDL_Surface *frame) {
 
 // Insert at position sorted by layer (largest first)
 void Stage::addSprite(Sprite *s) {
+    if (*s->layer < 0 || *s->layer >= d) {
+        throw std::runtime_error("Sprite has invalid layer for this stage!");
+        return;
+    }
+
     if (SPRITES == nullptr) {
         SPRITES = new SpriteNode();
         SPRITES->cur = s;
@@ -220,6 +251,8 @@ void Stage::addSprite(Sprite *s) {
     return;
 }
 
+// Remove a sprite such that it is no longer rendered
+// on calling update(frame).
 void Stage::removeSprite(Sprite *s) {
     SpriteNode *prev = nullptr;
     SpriteNode *cursor = SPRITES;
@@ -243,6 +276,7 @@ void Stage::removeSprite(Sprite *s) {
 
 /////////////////////////////////////
 
+// Get all sprites stored in this stage which touches s
 std::vector<Sprite *> Stage::getTouching(Sprite *s) const {
     std::vector<Sprite *> out;
     for (SpriteNode *cursor = SPRITES; cursor != nullptr; cursor = cursor->next) {
@@ -254,6 +288,7 @@ std::vector<Sprite *> Stage::getTouching(Sprite *s) const {
     return out;
 }
 
+// Get all sprites storing in this stage which have the type t
 std::vector<Sprite *> Stage::getOfType(SPRITE_TYPE t) const {
     std::vector<Sprite *> out;
     for (SpriteNode *cursor = SPRITES; cursor != nullptr; cursor = cursor->next) {
