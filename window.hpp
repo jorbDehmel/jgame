@@ -14,19 +14,37 @@
 
 /////////////////////////////////////
 
-Uint8 BITDEPTH = 32;
-#define PIXEL_TYPE Uint32
+typedef unsigned char u8;
+typedef unsigned short u16;
+typedef unsigned int u32;
+typedef unsigned long u64;
+typedef unsigned long long u128;
+
+typedef char i8;
+typedef short i16;
+typedef int i32;
+typedef long i64;
+typedef long long i128;
+
+typedef float f32;
+typedef double f64;
+typedef long double f128;
+
+/////////////////////////////////////
+
+u8 BITDEPTH = 32;
+#define PIXEL_TYPE u32
 
 #define KEYARRSIZE 332
 
 std::bitset<KEYARRSIZE + (4 - (KEYARRSIZE % 4))> KEYS;
-Uint8 MOUSESTATE;
-int MOUSE_X, MOUSE_Y;
+u8 MOUSESTATE;
+i32 MOUSE_X, MOUSE_Y;
 bool ISRUNNING = true;
 
 #ifdef STEADY_FRAMERATE
     std::chrono::_V2::steady_clock::time_point prev_time, cur_time;
-    int toWait;
+    i32 toWait;
 #endif
 
 /////////////////////////////////////
@@ -35,8 +53,8 @@ bool ISRUNNING = true;
 // Optimized for computer use, IE will not work without a keyboard and mouse.
 class Window {
 public:
-    Window(Uint16 h, Uint16 w, Uint16 rt, char *t, void (*update)(SDL_Surface *frame),
-        SDL_WindowFlags windowFlag, Uint8 bd);
+    Window(u16 h, u16 w, u16 rt, char *t, void (*update)(SDL_Surface *frame),
+        SDL_WindowFlags windowFlag, u8 bd);
     
     void scanEvents();
     void runFrame();
@@ -45,9 +63,9 @@ public:
 
     void (*update)(SDL_Surface *frame);
     
-    Uint16 HEIGHT;
-    Uint16 WIDTH;
-    Uint16 REFRESH_TIME;
+    u16 HEIGHT;
+    u16 WIDTH;
+    u16 REFRESH_TIME;
 
     char *TITLE;
 
@@ -59,8 +77,8 @@ public:
 
 // Takes height, width, refresh time in milliseconds, window title, 
 // frame updating function by reference, SDL window flag, and bitdepth.
-Window::Window(Uint16 h, Uint16 w, Uint16 rt, char *t, void (*updateFunc)(SDL_Surface *frame),
-        SDL_WindowFlags windowFlag = SDL_WINDOW_OPENGL, Uint8 bd = BITDEPTH) {
+Window::Window(u16 h, u16 w, u16 rt, char *t, void (*updateFunc)(SDL_Surface *frame),
+        SDL_WindowFlags windowFlag = SDL_WINDOW_OPENGL, u8 bd = BITDEPTH) {
     
     HEIGHT = h;
     WIDTH = w;

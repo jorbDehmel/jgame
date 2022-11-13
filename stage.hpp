@@ -27,14 +27,14 @@ class Sprite {
 public:
     Sprite();
 
-    Sprite(SDL_Surface *s, int &xIn, int &yIn, Uint8 &l);
-    Sprite(SDL_Surface *s, Uint8 l);
+    Sprite(SDL_Surface *s, i32 &xIn, i32 &yIn, u8 &l);
+    Sprite(SDL_Surface *s, u8 l);
     ~Sprite();
 
     SDL_Surface *surface;
 
-    int *x, *y;
-    Uint8 *layer;
+    i32 *x, *y;
+    u8 *layer;
 
     SPRITE_TYPE type;
 };
@@ -48,7 +48,7 @@ Sprite::Sprite() {
 
 // Construct a Sprite given a surface (costume) and variables
 // to be associated with x, y, and layer.
-Sprite::Sprite(SDL_Surface *s, int &xIn, int &yIn, Uint8 &l) {
+Sprite::Sprite(SDL_Surface *s, i32 &xIn, i32 &yIn, u8 &l) {
     surface = s;
     x = &xIn;
     y = &yIn;
@@ -57,11 +57,11 @@ Sprite::Sprite(SDL_Surface *s, int &xIn, int &yIn, Uint8 &l) {
 
 // Construct a Sprite given a costume and a layer.
 // Variable references are generated within.
-Sprite::Sprite(SDL_Surface *s, Uint8 l) {
+Sprite::Sprite(SDL_Surface *s, u8 l) {
     surface = s;
-    x = new int(0);
-    y = new int(0);
-    layer = new Uint8(l);
+    x = new i32(0);
+    y = new i32(0);
+    layer = new u8(l);
 }
 
 // Dealloc associated memory
@@ -140,7 +140,7 @@ struct SpriteNode {
 // when update is called.
 class Stage {
 public:
-    Stage(Uint16 height, Uint16 width, Uint8 depth);
+    Stage(u16 height, u16 width, u8 depth);
 
     void update(SDL_Surface *frame);
 
@@ -153,8 +153,8 @@ public:
     SpriteNode *SPRITES;
 
     // height, width, depth
-    Uint16 h, w;
-    Uint8 d;
+    u16 h, w;
+    u8 d;
 
     /////////////Temps////////////
     PIXEL_TYPE *pixels;
@@ -167,7 +167,7 @@ public:
 /////////////////////////////////////
 
 // Create an empty stage with the given height, width and depth.
-Stage::Stage(Uint16 height, Uint16 width, Uint8 depth) {
+Stage::Stage(u16 height, u16 width, u8 depth) {
     SPRITES = nullptr;
     h = height;
     w = width;
