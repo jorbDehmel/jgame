@@ -101,10 +101,10 @@ protected:
 std::bitset<8> isTouching(Sprite *a, Sprite *b) {
     std::bitset<8> output;
 
-    output[0] = *a->x + a->surface->w >= *b->x && *a->x + a->surface->w < *b->x + b->surface->w;
-    output[1] = *a->y + a->surface->h >= *b->y && *a->y + a->surface->h < *b->y + b->surface->h;
-    output[2] = *a->x >= *b->x && *a->x < *b->x + b->surface->w;
-    output[3] = *a->y >= *b->y && *a->y < *b->y + b->surface->h;
+    output[0] = *a->x + a->surface->w >= *b->x && *a->x + a->surface->w <= *b->x + b->surface->w;
+    output[1] = *a->y + a->surface->h >= *b->y && *a->y + a->surface->h <= *b->y + b->surface->h;
+    output[2] = *a->x >= *b->x && *a->x <= *b->x + b->surface->w;
+    output[3] = *a->y >= *b->y && *a->y <= *b->y + b->surface->h;
     output[4] = output[3] && (output[0] || output[2]);
     output[5] = output[0] && (output[1] || output[3]);
     output[6] = output[1] && (output[0] || output[2]);

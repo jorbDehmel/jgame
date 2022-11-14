@@ -20,13 +20,28 @@ char *concat(const char a[], char *b) {
 
 /////////////////////////////////////
 
+enum DIRECTION_TYPE {
+    LEFT,
+    RIGHT,
+    UP,
+    DOWN,
+    LEFTUP,
+    LEFTDOWN,
+    RIGHTUP,
+    RIGHTDOWN,
+    TOWARDS,
+    AWAY
+};
+
+/////////////////////////////////////
+
 // A slightly improved version of the sprite object
 // Holds its own x, y, and layer rather than holding a pointer.
 // Also able to hold multiple frames and cycle through them.
 class SmartSprite: public Sprite {
 public:
-    SmartSprite(Uint8 numF, SDL_Surface **s, int x = 0, int y = 0, Uint8 l = 0, SPRITE_TYPE t = PLAYER);
-    SmartSprite(Uint8 numF, char *folder, int x = 0, int y = 0, Uint8 l = 0, Uint8 scale = 1, SPRITE_TYPE t = PLAYER);
+    SmartSprite(u8 numF, Surface **s, int x = 0, int y = 0, u8 l = 0, SPRITE_TYPE t = PLAYER);
+    SmartSprite(u8 numF, char *folder, int x = 0, int y = 0, u8 l = 0, u8 scale = 1, SPRITE_TYPE t = PLAYER);
 
     ~SmartSprite();
 
@@ -34,8 +49,11 @@ public:
     inline int Y() const { return *y; }
     inline void X(int t) { *x = t; }
     inline void Y(int t) { *y = t; }
-    inline Uint8 L() const { return *layer; }
+    inline u8 L() const { return *layer; }
     inline void L(int t) { if (t > 0) *layer = t; }
+
+    inline int W() const { return surface->w; }
+    inline int H() const { return surface->h; }
 
     inline void xInc(int t = 1) { (*x) += t; }
     inline void yInc(int t = 1) { (*y) += t; }
@@ -55,17 +73,19 @@ public:
         surface = frames[curFrame];
     }
 
-    Uint8 numFrames;
-    Uint8 curFrame;
-    SDL_Surface **frames;
+    DIRECTION_TYPE direction;
+
+    u8 numFrames;
+    u8 curFrame;
+    Surface **frames;
 };
 
 /////////////////////////////////////
 
-// Initialize a smartSprite from a list of SDL_Surface * frames.
-SmartSprite::SmartSprite(Uint8 numF, SDL_Surface **s, int x, int y, Uint8 l, SPRITE_TYPE t) {
+// Initialize a smartSprite from a list of Surface * frames.
+SmartSprite::SmartSprite(u8 numF, Surface **s, int x, int y, u8 l, SPRITE_TYPE t) {
     numFrames = numF;
-    frames = new SDL_Surface*[numFrames];
+    frames = new Surface*[numFrames];
     for (int i = 0; i < numFrames; i++) {
         frames[i] = s[i];
     }
@@ -74,12 +94,12 @@ SmartSprite::SmartSprite(Uint8 numF, SDL_Surface **s, int x, int y, Uint8 l, SPR
 
     this->x = new int(x);
     this->y = new int(y);
-    this->layer = new Uint8(l);
+    this->layer = new u8(l);
     this->surface = frames[curFrame];
 }
 
 // Initialize a smartSprite from a folder path and a number of frames to load.
-SmartSprite::SmartSprite(Uint8 numF, char *folder, int x, int y, Uint8 l, Uint8 scale, SPRITE_TYPE t) {
+SmartSprite::SmartSprite(u8 numF, char *folder, int x, int y, u8 l, u8 scale, SPRITE_TYPE t) {
     char **paths = new char*[numF];
 
     system(concat("ls >toload.temp ", folder));
@@ -98,7 +118,7 @@ SmartSprite::SmartSprite(Uint8 numF, char *folder, int x, int y, Uint8 l, Uint8 
     system("rm -f toload.temp");
 
     numFrames = numF;
-    frames = new SDL_Surface*[numF];
+    frames = new Surface*[numF];
     for (int i = 0; i < numF; i++) {
         frames[i] = SDL_LoadBMP(concat(concat(folder, (char*)"/"), paths[i]));    //loadTexture(concat(concat(folder, (char*)"/"), paths[i]), scale);
         upScale(frames[i], scale);
@@ -108,7 +128,7 @@ SmartSprite::SmartSprite(Uint8 numF, char *folder, int x, int y, Uint8 l, Uint8 
 
     this->x = new int(x);
     this->y = new int(y);
-    this->layer = new Uint8(l);
+    this->layer = new u8(l);
     this->surface = frames[curFrame];
 }
 
