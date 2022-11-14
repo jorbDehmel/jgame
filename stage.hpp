@@ -15,6 +15,7 @@ enum SPRITE_TYPE {
     FLOOR,
     ROOF,
     WALL,
+    BLOCK,
     ENEMY,
     ITEM,
     LABEL
@@ -80,6 +81,7 @@ Sprite::~Sprite() {
 class Collision {
 public:
     Collision(std::bitset<8> b): col(b) {};
+    Collision() {};
 
     bool upperX() { return col[0]; }
     bool upperY() { return col[1]; }

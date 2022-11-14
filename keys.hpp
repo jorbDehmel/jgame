@@ -47,6 +47,8 @@ namespace keys {
     cuint8 eight = '8';
     cuint8 nine = '9';
 
+    cuint8 space = ' ';
+
     cuint8 leftArrow = -1;
     cuint8 rightArrow = -1;
     cuint8 upArrow = -1;
