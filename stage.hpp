@@ -16,7 +16,8 @@ enum SPRITE_TYPE {
     ROOF,
     WALL,
     ENEMY,
-    ITEM
+    ITEM,
+    LABEL
 };
 
 /////////////////////////////////////
