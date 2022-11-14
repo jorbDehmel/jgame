@@ -1,16 +1,9 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#define DEBUG
-#define STEADY_FRAMERATE
-
 #include <SDL2/SDL.h>
 #include <stdexcept>
 #include <bitset>
-
-#ifdef STEADY_FRAMERATE
-    #include <chrono>
-#endif
 
 /////////////////////////////////////
 
@@ -41,11 +34,6 @@ std::bitset<KEYARRSIZE + (4 - (KEYARRSIZE % 4))> KEYS;
 u8 MOUSESTATE;
 i32 MOUSE_X, MOUSE_Y;
 bool ISRUNNING = true;
-
-#ifdef STEADY_FRAMERATE
-    std::chrono::_V2::steady_clock::time_point prev_time, cur_time;
-    i32 toWait;
-#endif
 
 /////////////////////////////////////
 
@@ -155,22 +143,10 @@ void Window::scanEvents() {
 // Call the (given at instantiation) update frame function and delay by 
 // the pre-given refresh time.
 void Window::runFrame() {
-    
-
     update(SDL_GetWindowSurface(window));
     SDL_UpdateWindowSurface(window);
-    
-    #ifdef STEADY_FRAMERATE
-        cur_time = std::chrono::steady_clock::now();
-        toWait = (REFRESH_TIME - (std::chrono::duration_cast<std::chrono::milliseconds>(cur_time - prev_time).count()));
-        prev_time = cur_time;
 
-        if (toWait > 0 && toWait < REFRESH_TIME) {
-            SDL_Delay(toWait);
-        }
-    #else
-        SDL_Delay(toWait);
-    #endif
+    SDL_Delay(REFRESH_TIME);
 
     return;
 }

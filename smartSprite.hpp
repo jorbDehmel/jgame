@@ -43,9 +43,11 @@ public:
 
     inline int frame() const { return curFrame; };
     inline void frame(int t) {
-        if (t > 0 && t < numFrames) {
+        if (t >= 0 && t < numFrames) {
             curFrame = t;
             surface = frames[curFrame];
+        } else {
+            throw std::runtime_error("Invalid frame position!");
         }
     };
     inline void incFrame(int t = 1) {
@@ -80,7 +82,6 @@ SmartSprite::SmartSprite(Uint8 numF, SDL_Surface **s, int x, int y, Uint8 l, SPR
 SmartSprite::SmartSprite(Uint8 numF, char *folder, int x, int y, Uint8 l, Uint8 scale, SPRITE_TYPE t) {
     char **paths = new char*[numF];
 
-    // ls folder >output_file
     system(concat("ls >toload.temp ", folder));
 
     // sort output file into paths
@@ -89,9 +90,11 @@ SmartSprite::SmartSprite(Uint8 numF, char *folder, int x, int y, Uint8 l, Uint8 
     if (!in.is_open()) throw std::runtime_error("Failed to open indexing file for folder texture loading");
     for (int i = 0; i < numF; i++) {
         paths[i] = new char[64];
-        in.getline(paths[i], 64);
+        in.getline(paths[i], 63);
+        paths[i][63] = '\0';
     }
     in.close();
+
     //system("rm -f toload.temp");
 
     numFrames = numF;
