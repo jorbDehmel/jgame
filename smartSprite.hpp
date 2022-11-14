@@ -95,7 +95,7 @@ SmartSprite::SmartSprite(Uint8 numF, char *folder, int x, int y, Uint8 l, Uint8 
     }
     in.close();
 
-    //system("rm -f toload.temp");
+    system("rm -f toload.temp");
 
     numFrames = numF;
     frames = new SDL_Surface*[numF];
