@@ -124,6 +124,7 @@ void invertX(SDL_Surface *s) {
             pixels[(y * s->w) + (s->w - x)] = temp;
         }
     }
+    return;
 }
 
 // Invert a surface's pixels such that its top is now its bottom
@@ -137,6 +138,7 @@ void invertY(SDL_Surface *s) {
             pixels[((s->h - y) * s->w) + x] = temp;
         }
     }
+    return;
 }
 
 /////////////////////////////////////
