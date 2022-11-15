@@ -7,6 +7,15 @@
 
 /////////////////////////////////////
 
+void copy_chararr(char *a, char *b) {
+    int size = 0; while (a[size] != '\0') size++;
+    b = new char[size + 1]; b[size] = '\0';
+    for (int i = 0; i < size; i++) b[i] = a[i];
+    return;
+}
+
+/////////////////////////////////////
+
 // Tags for sprite types (used in collision detection, etc)
 enum SPRITE_TYPE {
     PLAYER,
@@ -134,6 +143,7 @@ bool isMouseWithin(Sprite *a) {
 struct SpriteNode {
     Sprite *cur;
     SpriteNode *next;
+    char *name;
 };
 
 /////////////////////////////////////
@@ -147,8 +157,9 @@ public:
 
     void update(SDL_Surface *frame);
 
-    void addSprite(Sprite *s);
+    void addSprite(Sprite *s, char *name = nullptr);
     void removeSprite(Sprite *s);
+    void removeSprite(char *spriteName);
 
     std::vector<Sprite *> getTouching(Sprite *s) const;
     std::vector<Sprite *> getOfType(SPRITE_TYPE t) const;
@@ -219,9 +230,12 @@ void Stage::update(SDL_Surface *frame) {
 }
 
 // Insert at position sorted by layer (smallest first)
-void Stage::addSprite(Sprite *s) {
+void Stage::addSprite(Sprite *s, char *name) {
     if (SPRITES == nullptr) {
         SPRITES = new SpriteNode();
+
+        copy_chararr(name, SPRITES->name);
+        
         SPRITES->cur = s;
         SPRITES->next = nullptr;
     } else {
@@ -235,11 +249,13 @@ void Stage::addSprite(Sprite *s) {
         if (prev == nullptr) {
             SpriteNode *temp = SPRITES;
             SPRITES = new SpriteNode();
+            copy_chararr(name, SPRITES->name);
             SPRITES->next = temp;
             SPRITES->cur = s;
         } else {
             SpriteNode *temp = prev->next;
             prev->next = new SpriteNode();
+            copy_chararr(name, prev->next->name);
             prev->next->next = temp;
             prev->next->cur = s;
         }
@@ -258,6 +274,27 @@ void Stage::removeSprite(Sprite *s) {
     }
 
     if (cursor->cur == s) {
+        if (prev == nullptr) {
+            SPRITES = cursor->next;
+            delete cursor;
+        } else {
+            prev->next = cursor->next;
+            delete cursor;
+        }
+    }
+
+    return;
+}
+
+void Stage::removeSprite(char *spriteName) {
+    SpriteNode *prev = nullptr;
+    SpriteNode *cursor = SPRITES;
+    while (cursor != nullptr && cursor->name != spriteName) {
+        prev = cursor;
+        cursor = cursor->next;
+    }
+
+    if (cursor->name == spriteName) {
         if (prev == nullptr) {
             SPRITES = cursor->next;
             delete cursor;

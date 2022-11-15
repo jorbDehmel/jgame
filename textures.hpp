@@ -22,6 +22,7 @@ void upScale(SDL_Surface *&s, Uint8 scale) {
 void loadTexture(Sprite *s, const char *path, int scale = 1) {
     if (std::regex_match(path, std::regex(".*\\.bmp"))) {
         SDL_Surface *out = SDL_LoadBMP(path);
+        if (out == nullptr) throw std::runtime_error("Unable to load texture");
         upScale(out, scale);
         s->surface = out;
     } else {
@@ -35,6 +36,7 @@ void loadTexture(Sprite *s, const char *path, int scale = 1) {
 SDL_Surface *loadTexture(const char *path, int scale = 1) {
     if (std::regex_match(path, std::regex(".*\\.bmp"))) {
         SDL_Surface *out = SDL_LoadBMP(path);
+        if (out == nullptr) throw std::runtime_error("Unable to load texture");
         upScale(out, scale);
         return out;
     } else {
@@ -47,6 +49,8 @@ SDL_Surface *loadTexture(const char *path, int scale = 1) {
 // Tile a surface <into> with the contents of surface <from>
 // such that <from>'s pattern is repeated across <into>
 void tile(SDL_Surface *from, SDL_Surface *into) {
+    if (from == nullptr || into == nullptr) throw std::runtime_error("Cannot tile nullptrs");
+    
     PIXEL_TYPE *sourcePixels = (PIXEL_TYPE*)from->pixels;
     PIXEL_TYPE *pixels = (PIXEL_TYPE*)into->pixels;
     int source, destination;

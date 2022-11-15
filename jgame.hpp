@@ -10,5 +10,6 @@
 #include "smartSprite.hpp"
 #include "keys.hpp"
 #include "font.hpp"
+#include "levelStage.hpp"
 
 #endif
