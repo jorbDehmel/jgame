@@ -143,7 +143,7 @@ struct SpriteNode {
 // when update is called.
 class Stage {
 public:
-    Stage(u16 height, u16 width, u8 depth);
+    Stage(u16 height, u16 width, u8 depth = 1);
 
     void update(SDL_Surface *frame);
 
@@ -157,7 +157,6 @@ public:
 
     // height, width, depth
     u16 h, w;
-    u8 d;
 
     /////////////Temps////////////
     PIXEL_TYPE *pixels;
@@ -169,18 +168,17 @@ public:
 
 /////////////////////////////////////
 
-// Create an empty stage with the given height, width and depth.
+// Create an empty stage with the given height, width and depth (depth is depreciated).
 Stage::Stage(u16 height, u16 width, u8 depth) {
     SPRITES = nullptr;
     h = height;
     w = width;
-    d = depth;
 
     return;
 }
 
 // Update a passed frame so that it contains the stage's image
-// (with all sprites rendered from furthest away to closest)
+// (with all sprites rendered from furthest away to closest, layer 0 through infinity)
 void Stage::update(SDL_Surface *frame) {
     SDL_LockSurface(frame);
 
@@ -220,13 +218,8 @@ void Stage::update(SDL_Surface *frame) {
     return;
 }
 
-// Insert at position sorted by layer (largest first)
+// Insert at position sorted by layer (smallest first)
 void Stage::addSprite(Sprite *s) {
-    if (*s->layer < 0 || *s->layer >= d) {
-        throw std::runtime_error("Sprite has invalid layer for this stage!");
-        return;
-    }
-
     if (SPRITES == nullptr) {
         SPRITES = new SpriteNode();
         SPRITES->cur = s;
@@ -234,7 +227,7 @@ void Stage::addSprite(Sprite *s) {
     } else {
         SpriteNode *prev = nullptr;
         SpriteNode *cursor = SPRITES;
-        while (cursor != nullptr && *cursor->cur->layer > *s->layer) {
+        while (cursor != nullptr && *cursor->cur->layer < *s->layer) {
             prev = cursor;
             cursor = cursor->next;
         }

@@ -18,6 +18,27 @@ char *concat(const char a[], char *b) {
     return out;
 }
 
+char *concat(char a, char *b) {
+    int size = 0; while (b[size] != '\0') size++;
+    char *out = new char[size + 2];
+    out[0] = a; for (int i = 1; i < size + 1; i++) out[i] = b[i - 1];
+    out[size + 1] = '\0';
+    return out;
+}
+
+bool cmp_chararrs(char *a, char *b) {
+    int sizeA = 0, sizeB = 0;
+    while (a[sizeA] != '\0') sizeA++;
+    while (b[sizeB] != '\0') sizeB++;
+    if (sizeA != sizeB) {
+        return false;
+    }
+    for (int i = 0; i < sizeA; i++) {
+        if (a[i] != b[i]) return false;
+    }
+    return true;
+}
+
 /////////////////////////////////////
 
 enum DIRECTION_TYPE {
@@ -67,7 +88,19 @@ public:
         } else {
             throw std::runtime_error("Invalid frame position!");
         }
-    };
+        return;
+    }
+    inline void frame(char *name) {
+        for (int i = 0; i < numFrames; i++) {
+            if (cmp_chararrs(frameNames[i], name)) {
+                curFrame = i;
+                surface = frames[curFrame];
+                return;
+            }
+        }
+        throw std::runtime_error("Invalid frame name!");
+    }
+
     inline void incFrame(int t = 1) {
         curFrame = ((int)curFrame + t) % numFrames;
         surface = frames[curFrame];
@@ -78,6 +111,7 @@ public:
     u8 numFrames;
     u8 curFrame;
     Surface **frames;
+    char **frameNames;
 };
 
 /////////////////////////////////////
@@ -85,6 +119,7 @@ public:
 // Initialize a smartSprite from a list of Surface * frames.
 SmartSprite::SmartSprite(u8 numF, Surface **s, int x, int y, u8 l, SPRITE_TYPE t) {
     numFrames = numF;
+    frameNames = nullptr;
     frames = new Surface*[numFrames];
     for (int i = 0; i < numFrames; i++) {
         frames[i] = s[i];
@@ -100,7 +135,7 @@ SmartSprite::SmartSprite(u8 numF, Surface **s, int x, int y, u8 l, SPRITE_TYPE t
 
 // Initialize a smartSprite from a folder path and a number of frames to load.
 SmartSprite::SmartSprite(u8 numF, char *folder, int x, int y, u8 l, u8 scale, SPRITE_TYPE t) {
-    char **paths = new char*[numF];
+    frameNames = new char*[numF];
 
     system(concat("ls >toload.temp ", folder));
 
@@ -109,9 +144,9 @@ SmartSprite::SmartSprite(u8 numF, char *folder, int x, int y, u8 l, u8 scale, SP
     in.open("toload.temp");
     if (!in.is_open()) throw std::runtime_error("Failed to open indexing file for folder texture loading");
     for (int i = 0; i < numF; i++) {
-        paths[i] = new char[64];
-        in.getline(paths[i], 63);
-        paths[i][63] = '\0';
+        frameNames[i] = new char[64];
+        for (int j = 0; j < 64; j++) frameNames[i][j] = '\0';
+        in.getline(frameNames[i], 63);
     }
     in.close();
 
@@ -120,7 +155,7 @@ SmartSprite::SmartSprite(u8 numF, char *folder, int x, int y, u8 l, u8 scale, SP
     numFrames = numF;
     frames = new Surface*[numF];
     for (int i = 0; i < numF; i++) {
-        frames[i] = SDL_LoadBMP(concat(concat(folder, (char*)"/"), paths[i]));    //loadTexture(concat(concat(folder, (char*)"/"), paths[i]), scale);
+        frames[i] = SDL_LoadBMP(concat(concat(folder, (char*)"/"), frameNames[i]));    //loadTexture(concat(concat(folder, (char*)"/"), paths[i]), scale);
         upScale(frames[i], scale);
     }
     curFrame = 0;
