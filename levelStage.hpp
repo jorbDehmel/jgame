@@ -3,7 +3,6 @@
 #include <fstream>
 #include <regex>
 #include <string>
-#include <iostream>
 
 using namespace std;
 
@@ -133,6 +132,9 @@ public:
     u8 level() const;
     void level(u8 toLoadNumber);
     void level(char *toLoadName);
+
+    vector<Sprite *> getTouching(Sprite *s) const;
+    vector<Sprite *> getOfType(SPRITE_TYPE t) const;
     
     void incLevel(u8 by = 1);
     u16 numLevels;
@@ -146,15 +148,7 @@ protected:
 
 /////////////////////////////////////
 
-/* Level list file structure:
-numLevels
-level
-level
-level
-*/
-
 LevelStage::LevelStage(u16 height, u16 width, char *levelListFile) {
-
     // Load from levelListFile file
     loader.open(levelListFile);
     if (loader.is_open()) {
@@ -237,12 +231,23 @@ void LevelStage::level(char *toLoadName) {
     return;
 }
 
+/////////////////////////////////////
+
+vector<Sprite *> LevelStage::getTouching(Sprite *s) const {
+    return stage->getTouching(s);
+}
+
+vector<Sprite *> LevelStage::getOfType(SPRITE_TYPE t) const {
+    return stage->getOfType(t);
+}
+
+/////////////////////////////////////
+
 void LevelStage::incLevel(u8 by) {
     if (by > 0) {
         currentLevel += by;
         currentLevel %= numLevels;
         
-        std::cout << levelPaths[currentLevel] << '\n';
         assert(!loader.is_open());
 
         loader.open(levelPaths[currentLevel]);
