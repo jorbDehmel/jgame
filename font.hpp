@@ -73,6 +73,11 @@ void write(SmartSprite *font, char *what, Surface *where, bool first = true) {
     font->xInc(font->W() + 1);
 
     write(font, &what[1], where, false);
+
+    if (first) {
+        font->X(-font->W());
+    }
+
     return;
 }
 

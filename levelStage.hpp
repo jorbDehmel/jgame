@@ -41,7 +41,8 @@ void loadFileToStage(ifstream *loader, Stage *stage) {
         // Load new data
         while (!loader->eof()) {
             string name, spriteTag, frameTag;
-            int x, y, layer, scaleA, scaleB, numFrames;
+            int x, y, layer, numFrames;
+            double scaleA, scaleB;
             
             *loader >> name >> x >> y >> layer >> spriteTag >> 
                 scaleA >> scaleB >> numFrames >> frameTag;
@@ -68,7 +69,7 @@ void loadFileToStage(ifstream *loader, Stage *stage) {
             } else if (spriteTag == "WALL") {
                 tag = WALL;
             } else {
-                throw runtime_error("Invalid sprite tag");
+                throw runtime_error("Invalid sprite tag '" + spriteTag + "'");
             }
 
             SmartSprite *toAdd;
@@ -79,7 +80,7 @@ void loadFileToStage(ifstream *loader, Stage *stage) {
                 Surface **frames = new Surface*[numFrames];
                 for (int i = 0; i < numFrames; i++) {
                     *loader >> path;
-                    frames[i] = loadTexture(path.c_str(), scaleA);
+                    frames[i] = loadTexture(path.c_str(), stage->w * scaleA);
                 }
                 toAdd = new SmartSprite(numFrames, frames, x, y, layer, tag);
             }
@@ -87,7 +88,7 @@ void loadFileToStage(ifstream *loader, Stage *stage) {
             // Load from a folder
             else if (frameTag == "FOLDER") {
                 *loader >> path;
-                toAdd = new SmartSprite(numFrames, (char*)path.c_str(), x, y, layer, scaleA, tag);
+                toAdd = new SmartSprite(numFrames, (char*)path.c_str(), x, y, layer, stage->w * scaleA, tag);
             }
 
             // Load from 1 path, using tiling
@@ -96,7 +97,7 @@ void loadFileToStage(ifstream *loader, Stage *stage) {
 
                 Surface *from = loadTexture(path.c_str(), 1);
 
-                Surface *onto = SDL_CreateRGBSurface(0, scaleA, scaleB, BITDEPTH, 0, 0, 0, 0);
+                Surface *onto = SDL_CreateRGBSurface(0, stage->w * scaleA, stage->w * scaleB, BITDEPTH, 0, 0, 0, 0);
                 
                 tile(from, onto);
                 toAdd = new SmartSprite(1, &onto, x, y, layer, tag);

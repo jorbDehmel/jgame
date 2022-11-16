@@ -8,6 +8,29 @@ A simple game/graphical interface built on top of SDL.
 
 ------------------------------------------------------
 
+Using the Window object:
+
+    Starts and maintains a SDL_Window, but with easier
+access and abstracted management. Also maintains a list
+of pressed keys and other user input events. Takes a
+function at declaration that is called to update the
+screen every time it is updated. This function takes the
+form void update(Surface *frameToUpdate). It also takes
+width, height, and refresh time (in milliseconds to wait
+per frame).
+
+------------------------------------------------------
+
+Using the Stage object:
+
+    The stage holds a list of Sprites (holding a frame,
+position, and other metadata about an object in the game)
+which are rendered to a Surface when update() is called.
+These sprites can have their positions changed and update()
+will render them accordingly.
+
+------------------------------------------------------
+
 Using the LevelStage object:
 
     This object works similarly to a stage, except 
