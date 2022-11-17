@@ -21,6 +21,26 @@ per frame).
 
 ------------------------------------------------------
 
+Events:
+
+    Events are stored in global variables and are
+maintained by the current open Window object (if you try
+to run multiple windows, there are no guarentees events
+will act accordingly).
+
+    The current state of any pressed key is stored in
+KEYS[<keyname>], where keyname is its associated entry
+in keys::<name>. For instance, KEYS[keys::space] or
+KEYS[keys::esc]. For alphanumeric (lowercase) keys, you
+can also use KEYS['<lettername>'] (IE KEYS['a']).
+
+    The current mouse state is stored in MOUSESTATE.
+This can be decoded using the SDL_BUTTON(MOUSESTATE)
+to get the associated mouse button. The mouse x and y
+are maintained in MOUSE_X and MOUSE_Y respectively.
+
+------------------------------------------------------
+
 Using the Stage object:
 
     The stage holds a list of Sprites (holding a frame,

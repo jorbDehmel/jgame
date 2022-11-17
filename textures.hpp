@@ -1,7 +1,6 @@
 #ifndef TEXTURES_H
 #define TEXTURES_H
 
-#include <iostream>
 #include <cassert>
 #include "stage.hpp"
 #include <regex>
