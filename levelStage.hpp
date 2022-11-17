@@ -11,6 +11,7 @@ using namespace std;
 
 /////////////////////////////////////
 
+// Safely extract string data into a char*
 ifstream &operator >> (ifstream& stream, char *&into) {
     string temp = "#";
     
@@ -40,9 +41,9 @@ void loadFileToStage(ifstream *loader, Stage *stage) {
 
         // Load new data
         while (!loader->eof()) {
-            string name, spriteTag, frameTag;
-            int x, y, layer, numFrames;
-            double scaleA, scaleB;
+            string name, spriteTag, frameTag; 
+            int layer, numFrames;
+            double scaleA, scaleB, x, y;
             
             *loader >> name >> x >> y >> layer >> spriteTag >> 
                 scaleA >> scaleB >> numFrames >> frameTag;
@@ -82,13 +83,13 @@ void loadFileToStage(ifstream *loader, Stage *stage) {
                     *loader >> path;
                     frames[i] = loadTexture(path.c_str(), stage->w * scaleA);
                 }
-                toAdd = new SmartSprite(numFrames, frames, x, y, layer, tag);
+                toAdd = new SmartSprite(numFrames, frames, stage->w * x, stage->h * y, layer, tag);
             }
 
             // Load from a folder
             else if (frameTag == "FOLDER") {
                 *loader >> path;
-                toAdd = new SmartSprite(numFrames, (char*)path.c_str(), x, y, layer, stage->w * scaleA, tag);
+                toAdd = new SmartSprite(numFrames, (char*)path.c_str(), stage->w * x, stage->h * y, layer, stage->w * scaleA, tag);
             }
 
             // Load from 1 path, using tiling
@@ -100,7 +101,7 @@ void loadFileToStage(ifstream *loader, Stage *stage) {
                 Surface *onto = SDL_CreateRGBSurface(0, stage->w * scaleA, stage->w * scaleB, BITDEPTH, 0, 0, 0, 0);
                 
                 tile(from, onto);
-                toAdd = new SmartSprite(1, &onto, x, y, layer, tag);
+                toAdd = new SmartSprite(1, &onto, stage->w * x, stage->h * y, layer, tag);
             }
             
             else {
@@ -135,6 +136,7 @@ public:
     void level(char *toLoadName);
 
     vector<Sprite *> getTouching(Sprite *s) const;
+    vector<Sprite *> getAllTouching(Sprite *s) const;
     vector<Sprite *> getOfType(SPRITE_TYPE t) const;
     
     void incLevel(u8 by = 1);
@@ -149,6 +151,7 @@ protected:
 
 /////////////////////////////////////
 
+// Construct LevelStage given path to list
 LevelStage::LevelStage(u16 height, u16 width, char *levelListFile) {
     // Load from levelListFile file
     loader.open(levelListFile);
@@ -172,6 +175,7 @@ LevelStage::LevelStage(u16 height, u16 width, char *levelListFile) {
     return;
 }
 
+// Dealloc memory for levelStage
 LevelStage::~LevelStage() {
     delete stage;
     delete [] levelPaths;
@@ -181,21 +185,25 @@ LevelStage::~LevelStage() {
 
 /////////////////////////////////////
 
+// Render all sprites currently in frame and in memory to the passed frame
 void LevelStage::update(Surface *frame) {
     stage->update(frame);
     return;
 }
 
+// Add a sprite to frame (doesn't modify file)
 void LevelStage::addSprite(Sprite *sprite) {
     stage->addSprite(sprite);
     return;
 }
 
+// Remove a sprite form frame by pointer
 void LevelStage::removeSprite(Sprite *sprite) {
     stage->removeSprite(sprite);
     return;
 }
 
+// Remove a sprite from frame by name
 void LevelStage::removeSprite(char *spriteName) {
     stage->removeSprite(spriteName);
     return;
@@ -203,10 +211,12 @@ void LevelStage::removeSprite(char *spriteName) {
 
 /////////////////////////////////////
 
+// Get the current level
 u8 LevelStage::level() const {
     return currentLevel;
 }
 
+// Load a given level by number
 void LevelStage::level(u8 toLoadNumber) {
     if (toLoadNumber < numLevels) {
         loader.open(levelPaths[toLoadNumber]);
@@ -218,6 +228,7 @@ void LevelStage::level(u8 toLoadNumber) {
     return;
 }
 
+// Load a given level by name
 void LevelStage::level(char *toLoadName) {
     for (int i = 0; i < numLevels; i++) {
         if (levelPaths[i] == toLoadName) {
@@ -234,16 +245,24 @@ void LevelStage::level(char *toLoadName) {
 
 /////////////////////////////////////
 
+// Get all sprites s touches
 vector<Sprite *> LevelStage::getTouching(Sprite *s) const {
     return stage->getTouching(s);
 }
 
+// Get all sprites s touches AND that touch s
+vector<Sprite *> LevelStage::getAllTouching(Sprite *s) const {
+    return stage->getAllTouching(s);
+}
+
+// Get all sprites of a given type
 vector<Sprite *> LevelStage::getOfType(SPRITE_TYPE t) const {
     return stage->getOfType(t);
 }
 
 /////////////////////////////////////
 
+// Increment the current level by a number
 void LevelStage::incLevel(u8 by) {
     if (by > 0) {
         currentLevel += by;

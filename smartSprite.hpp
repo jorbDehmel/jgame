@@ -18,6 +18,7 @@ char *concat(const char a[], char *b) {
     return out;
 }
 
+// Concatenate two string literals
 char *concat(char a, char *b) {
     int size = 0; while (b[size] != '\0') size++;
     char *out = new char[size + 2];
@@ -26,6 +27,7 @@ char *concat(char a, char *b) {
     return out;
 }
 
+// Compare two chararr literals (basic bool)
 bool cmp_chararrs(char *a, char *b) {
     int sizeA = 0, sizeB = 0;
     while (a[sizeA] != '\0') sizeA++;
@@ -41,6 +43,7 @@ bool cmp_chararrs(char *a, char *b) {
 
 /////////////////////////////////////
 
+// For holding in a sprite to indicate current costume direction
 enum DIRECTION_TYPE {
     LEFT,
     RIGHT,

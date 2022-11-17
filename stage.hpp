@@ -7,6 +7,7 @@
 
 /////////////////////////////////////
 
+// Copy a char* into another safely
 void copy_chararr(char *a, char *b) {
     int size = 0; while (a[size] != '\0') size++;
     b = new char[size + 1]; b[size] = '\0';
@@ -162,6 +163,7 @@ public:
     void removeSprite(char *spriteName);
 
     std::vector<Sprite *> getTouching(Sprite *s) const;
+    std::vector<Sprite *> getAllTouching(Sprite *s) const;
     std::vector<Sprite *> getOfType(SPRITE_TYPE t) const;
 
     SpriteNode *SPRITES;
@@ -286,6 +288,7 @@ void Stage::removeSprite(Sprite *s) {
     return;
 }
 
+// Remove a sprite by name
 void Stage::removeSprite(char *spriteName) {
     SpriteNode *prev = nullptr;
     SpriteNode *cursor = SPRITES;
@@ -313,8 +316,26 @@ void Stage::removeSprite(char *spriteName) {
 std::vector<Sprite *> Stage::getTouching(Sprite *s) const {
     std::vector<Sprite *> out;
     for (SpriteNode *cursor = SPRITES; cursor != nullptr; cursor = cursor->next) {
-        if (cursor->cur->type == BACKGROUND || cursor->cur->type == DECORE) continue;
-        if (isTouchingVague(s, cursor->cur)) {
+        if (cursor->cur->type == BACKGROUND || cursor->cur->type == DECORE) {
+            continue;
+        }
+        
+        else if (isTouchingVague(s, cursor->cur)) {
+            out.push_back(cursor->cur);
+        }
+    }
+    return out;
+}
+
+// Get all sprites where either isTouchingVague(sprite, s) or isTouchingVague(s, sprite) is true
+std::vector<Sprite *> Stage::getAllTouching(Sprite *s) const {
+    std::vector<Sprite *> out;
+    for (SpriteNode *cursor = SPRITES; cursor != nullptr; cursor = cursor->next) {
+        if (cursor->cur->type == BACKGROUND || cursor->cur->type == DECORE) {
+            continue;
+        }
+
+        else if (isTouchingVague(s, cursor->cur) || isTouchingVague(cursor->cur, s)) {
             out.push_back(cursor->cur);
         }
     }

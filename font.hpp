@@ -3,6 +3,9 @@
 #ifndef FONT_H
 #define FONT_H
 
+/////////////////////////////////////
+
+// Write using a specific type of font sprite
 void write(SmartSprite *font, char *what, Surface *where, bool first = true) {
     if (what == nullptr || what[0] == '\0') {
         return;
@@ -80,5 +83,7 @@ void write(SmartSprite *font, char *what, Surface *where, bool first = true) {
 
     return;
 }
+
+/////////////////////////////////////
 
 #endif
