@@ -166,6 +166,8 @@ public:
     std::vector<Sprite *> getAllTouching(Sprite *s) const;
     std::vector<Sprite *> getOfType(SPRITE_TYPE t) const;
 
+    std::vector<Sprite *> getOfType() const;
+
     SpriteNode *SPRITES;
 
     // height, width, depth
@@ -349,6 +351,15 @@ std::vector<Sprite *> Stage::getOfType(SPRITE_TYPE t) const {
         if (cursor->cur->type == t) {
             out.push_back(cursor->cur);
         }
+    }
+    return out;
+}
+
+// Get all sprites
+std::vector<Sprite *> Stage::getOfType() const {
+    std::vector<Sprite *> out;
+    for (SpriteNode *cursor = SPRITES; cursor != nullptr; cursor = cursor->next) {
+        out.push_back(cursor->cur);
     }
     return out;
 }

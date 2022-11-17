@@ -138,6 +138,8 @@ public:
     vector<Sprite *> getTouching(Sprite *s) const;
     vector<Sprite *> getAllTouching(Sprite *s) const;
     vector<Sprite *> getOfType(SPRITE_TYPE t) const;
+
+    vector<Sprite *> getOfType() const;
     
     void incLevel(u8 by = 1);
     u16 numLevels;
@@ -258,6 +260,11 @@ vector<Sprite *> LevelStage::getAllTouching(Sprite *s) const {
 // Get all sprites of a given type
 vector<Sprite *> LevelStage::getOfType(SPRITE_TYPE t) const {
     return stage->getOfType(t);
+}
+
+// Get all sprites
+vector<Sprite *> LevelStage::getOfType() const {
+    return stage->getOfType();
 }
 
 /////////////////////////////////////
