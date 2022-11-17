@@ -274,12 +274,14 @@ void LevelStage::incLevel(u8 by) {
     if (by > 0) {
         currentLevel += by;
         currentLevel %= numLevels;
-        
+
         assert(!loader.is_open());
+        assert(currentLevel < numLevels); // idk how this would fail but just in case
 
         loader.open(levelPaths[currentLevel]);
         loadFileToStage(&loader, stage);
         loader.close();
+
         return;
     } else {
         throw runtime_error("Invalid frame incrementation");

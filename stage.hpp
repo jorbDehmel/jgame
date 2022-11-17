@@ -326,6 +326,9 @@ std::vector<Sprite *> Stage::getTouching(Sprite *s) const {
             out.push_back(cursor->cur);
         }
     }
+
+    if (out.empty()) out.push_back(nullptr);
+
     return out;
 }
 
@@ -341,6 +344,9 @@ std::vector<Sprite *> Stage::getAllTouching(Sprite *s) const {
             out.push_back(cursor->cur);
         }
     }
+
+    if (out.empty()) out.push_back(nullptr);
+
     return out;
 }
 
@@ -352,6 +358,9 @@ std::vector<Sprite *> Stage::getOfType(SPRITE_TYPE t) const {
             out.push_back(cursor->cur);
         }
     }
+
+    if (out.empty()) out.push_back(nullptr);
+
     return out;
 }
 
@@ -361,6 +370,9 @@ std::vector<Sprite *> Stage::getOfType() const {
     for (SpriteNode *cursor = SPRITES; cursor != nullptr; cursor = cursor->next) {
         out.push_back(cursor->cur);
     }
+
+    if (out.empty()) out.push_back(nullptr);
+
     return out;
 }
 
