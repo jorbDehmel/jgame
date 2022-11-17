@@ -6,7 +6,7 @@
 /////////////////////////////////////
 
 // Write using a specific type of font sprite
-void write(SmartSprite *font, char *what, Surface *where, bool first = true) {
+void write(SmartSprite *font, char *what, Surface *where, u16 returnX, bool first = true) {
     if (what == nullptr || what[0] == '\0') {
         return;
     }
@@ -67,6 +67,11 @@ void write(SmartSprite *font, char *what, Surface *where, bool first = true) {
         font->frame((char*)"_semicolon.bmp");
         stamp(font, where);
         break;
+    case '\n':
+        font->yInc(font->H() + 1);
+        font->X(0);
+        font->xInc(-font->W() - 1);
+        break;
     default:
         font->frame(concat(what[0], (char*)".bmp"));
         stamp(font, where);
@@ -74,8 +79,12 @@ void write(SmartSprite *font, char *what, Surface *where, bool first = true) {
     }
 
     font->xInc(font->W() + 1);
+    if (font->X() + font->W() + 1 >= returnX) {
+        font->yInc(font->H() + 1);
+        font->X(0);
+    }
 
-    write(font, &what[1], where, false);
+    write(font, &what[1], where, returnX, false);
 
     if (first) {
         font->X(-font->W());

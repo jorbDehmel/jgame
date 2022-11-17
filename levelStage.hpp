@@ -132,6 +132,7 @@ public:
     void removeSprite(char *spriteName);
 
     u8 level() const;
+    char *levelName() const;
     void level(u8 toLoadNumber);
     void level(char *toLoadName);
 
@@ -216,6 +217,11 @@ void LevelStage::removeSprite(char *spriteName) {
 // Get the current level
 u8 LevelStage::level() const {
     return currentLevel;
+}
+
+// Get the current level name
+char *LevelStage::levelName() const {
+    return levelPaths[currentLevel];
 }
 
 // Load a given level by number
