@@ -87,6 +87,7 @@ Window::Window(u16 h, u16 w, u16 rt, char *t, void (*updateFunc)(SDL_Surface *fr
     ISRUNNING = true;
 
     SDL_Init(SDL_INIT_VIDEO);
+    SDL_Init(SDL_INIT_AUDIO);
 
     window = SDL_CreateWindow(
         TITLE,

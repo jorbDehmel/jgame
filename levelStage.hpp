@@ -1,8 +1,11 @@
 #include "jgame.hpp"
+#include "audio.hpp"
 
 #include <fstream>
 #include <regex>
 #include <string>
+
+#include <iostream>
 
 using namespace std;
 
@@ -38,8 +41,24 @@ void loadFileToStage(ifstream *loader, Stage *stage) {
         while (stage->SPRITES != nullptr) {
             stage->removeSprite(stage->SPRITES->cur);
         }
+        for (WAV sound : stage->sounds) {
+            SDL_FreeWAV(sound.wavBuffer);
+        }
+        stage->sounds.clear();
 
-        // Load new data
+        // Load sounds
+        int numSounds = 0;
+        string temp;
+        WAV wavTemp;
+        *loader >> numSounds;
+        for (int i = 0; i < numSounds; i++) {
+            *loader >> temp;
+            loadWAV((char*)temp.c_str(), &wavTemp);
+            cout << "Added sound: '" << wavTemp.name << "'\n";
+            stage->sounds.push_back(wavTemp);
+        }
+
+        // Load sprites
         while (!loader->eof()) {
             string name, spriteTag, frameTag; 
             int layer, numFrames;
@@ -141,6 +160,7 @@ public:
     vector<Sprite *> getOfType(SPRITE_TYPE t) const;
 
     vector<Sprite *> getOfType() const;
+    void playSound(char *name) const;
     
     void incLevel(u8 by = 1);
     u16 numLevels;
@@ -271,6 +291,13 @@ vector<Sprite *> LevelStage::getOfType(SPRITE_TYPE t) const {
 // Get all sprites
 vector<Sprite *> LevelStage::getOfType() const {
     return stage->getOfType();
+}
+
+/////////////////////////////////////
+
+void LevelStage::playSound(char *name) const {
+    stage->playSound(name);
+    return;
 }
 
 /////////////////////////////////////

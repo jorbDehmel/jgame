@@ -2,8 +2,12 @@
 #define STAGE_H
 
 #include "window.hpp"
+#include "audio.hpp"
 #include <fstream>
 #include <vector>
+
+#include <iostream>
+using std::cout;
 
 /////////////////////////////////////
 
@@ -167,8 +171,10 @@ public:
     std::vector<Sprite *> getOfType(SPRITE_TYPE t) const;
 
     std::vector<Sprite *> getOfType() const;
+    void playSound(char *name);
 
     SpriteNode *SPRITES;
+    std::vector<WAV> sounds;
 
     // height, width, depth
     u16 h, w;
@@ -374,6 +380,18 @@ std::vector<Sprite *> Stage::getOfType() const {
     if (out.empty()) out.push_back(nullptr);
 
     return out;
+}
+
+// Play a wav which has been loaded into memory
+void Stage::playSound(char *name) {
+    for (WAV sound : sounds) {
+        for (int i = 0; name[i] != '\0' && name[i] == sound.name[i]; i++) {
+            playWAV(&sound);
+            return;
+        }
+    }
+    throw std::runtime_error("Invalid sound name in stage");
+    return;
 }
 
 /////////////////////////////////////

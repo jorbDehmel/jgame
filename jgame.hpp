@@ -11,5 +11,6 @@
 #include "keys.hpp"
 #include "font.hpp"
 #include "levelStage.hpp"
+#include "audio.hpp"
 
 #endif
