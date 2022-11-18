@@ -223,7 +223,7 @@ void Stage::update(SDL_Surface *frame) {
                 //if (!sprite->GO_OFFSCREEN) destination %= h * w;
 
                 // Ignore if out of bounds
-                if (destination > 0 && destination < h * w) {
+                if (destination >= 0 && destination < h * w) {
                     // Place pixel (skipping transparency)
                     if (sourcePixels[source] != 0) pixels[destination] = sourcePixels[source];
                 }
