@@ -6,9 +6,6 @@
 #include <fstream>
 #include <vector>
 
-#include <iostream>
-using std::cout;
-
 /////////////////////////////////////
 
 // Copy a char* into another safely

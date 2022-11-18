@@ -54,7 +54,6 @@ void loadFileToStage(ifstream *loader, Stage *stage) {
         for (int i = 0; i < numSounds; i++) {
             *loader >> temp;
             loadWAV((char*)temp.c_str(), &wavTemp);
-            cout << "Added sound: '" << wavTemp.name << "'\n";
             stage->sounds.push_back(wavTemp);
         }
 
