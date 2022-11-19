@@ -37,10 +37,13 @@ void loadWAV(char *path, WAV *toLoad) {
     return;
 }
 
+WAV loadWAV(char *path) {
+    WAV toLoad;
+    loadWAV(path, &toLoad);
+    return toLoad;
+}
+
 void playWAV(WAV *toPlay) {
-    if (!AUDIO_IS_INIT) {
-        initializeAudio();
-    }
     deviceId = SDL_OpenAudioDevice(NULL, 0, &toPlay->wavSpec, NULL, 0);
     SDL_QueueAudio(deviceId, toPlay->wavBuffer, toPlay->wavLength);
     SDL_PauseAudioDevice(deviceId, 0);

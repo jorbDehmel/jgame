@@ -6,6 +6,8 @@
 #include <fstream>
 #include <vector>
 
+#include <iostream>
+
 /////////////////////////////////////
 
 // Copy a char* into another safely
@@ -29,7 +31,8 @@ enum SPRITE_TYPE {
     BLOCK,
     ENEMY,
     ITEM,
-    LABEL
+    LABEL,
+    NPC
 };
 
 /////////////////////////////////////
@@ -191,6 +194,7 @@ Stage::Stage(u16 height, u16 width, u8 depth) {
     SPRITES = nullptr;
     h = height;
     w = width;
+    sounds.clear();
 
     return;
 }

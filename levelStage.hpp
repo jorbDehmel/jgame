@@ -87,6 +87,8 @@ void loadFileToStage(ifstream *loader, Stage *stage) {
                 tag = ROOF;
             } else if (spriteTag == "WALL") {
                 tag = WALL;
+            } else if (spriteTag == "NPC") {
+                tag = NPC;
             } else {
                 throw runtime_error("Invalid sprite tag '" + spriteTag + "'");
             }
@@ -163,7 +165,7 @@ public:
     
     void incLevel(u8 by = 1);
     u16 numLevels;
-protected:
+    
     ifstream loader;
 
     u8 currentLevel;

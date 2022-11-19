@@ -9,8 +9,11 @@
 #include "textures.hpp"
 #include "smartSprite.hpp"
 #include "keys.hpp"
-#include "font.hpp"
 #include "levelStage.hpp"
 #include "audio.hpp"
+
+// Non-neccessary ones:
+#include "font.hpp"
+#include "drivers.hpp"
 
 #endif
