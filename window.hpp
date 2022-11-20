@@ -3,7 +3,10 @@
 
 #include <SDL2/SDL.h>
 #include <stdexcept>
+#include <set>
 #include <bitset>
+
+#include <iostream>
 
 /////////////////////////////////////
 
@@ -28,12 +31,55 @@ typedef SDL_Window RawWindow;
 
 /////////////////////////////////////
 
+std::set<int> KEYS_SET;
+class KeyArrType {
+public:
+    inline bool operator[] (int key) {
+        return (KEYS_SET.find(key) != KEYS_SET.end());
+    }
+
+    inline bool empty() {
+        return KEYS_SET.empty();
+    }
+
+    inline bool any() {
+        return !KEYS_SET.empty();
+    }
+
+    inline void clear() {
+        KEYS_SET.clear();
+        return;
+    }
+
+    inline void insert(int key) {
+        KEYS_SET.insert(key);
+        return;
+    }
+
+    inline void erase(int key) {
+        KEYS_SET.erase(key);
+        return;
+    }
+
+    inline int size() {
+        return KEYS_SET.size();
+    }
+
+    std::set<int>::iterator begin() {
+        return KEYS_SET.begin();
+    }
+
+    std::set<int>::iterator end() {
+        return KEYS_SET.end();
+    }
+};
+KeyArrType KEYS;
+
+/////////////////////////////////////
+
 u8 BITDEPTH = 32;
 #define PIXEL_TYPE u32
 
-#define KEYARRSIZE 332
-
-std::bitset<KEYARRSIZE + (4 - (KEYARRSIZE % 4))> KEYS;
 u8 MOUSESTATE;
 i32 MOUSE_X, MOUSE_Y;
 bool ISRUNNING = true;
@@ -80,7 +126,7 @@ Window::Window(u16 h, u16 w, u16 rt, char *t, void (*updateFunc)(SDL_Surface *fr
     BITDEPTH = bd;
 
     // Initialize globals
-    KEYS = 0;
+    KEYS.clear();
     MOUSESTATE = '\0';
     MOUSE_X = MOUSE_Y = 1;
 
@@ -114,16 +160,12 @@ void Window::scanEvents() {
     while (SDL_PollEvent(&event)) {
         switch(event.type) {
             case SDL_KEYDOWN:
-                if (event.key.keysym.sym < KEYARRSIZE) {
-                    KEYS[event.key.keysym.sym] = true;
-                }
+                //std::cout << (int)event.key.keysym.sym << '\n';
+                KEYS.insert((int)event.key.keysym.sym);
                 break;
             case SDL_KEYUP:
-                if (event.key.keysym.sym < KEYARRSIZE) {
-                    KEYS[event.key.keysym.sym] = false;
-                }
+                KEYS.erase(event.key.keysym.sym);
                 break;
-
             case SDL_MOUSEMOTION:
                 MOUSE_X = event.motion.x;
                 MOUSE_Y = event.motion.y;

@@ -46,14 +46,17 @@ public:
 //////////////////////////////////////////////////
 
 ScrollDriver::ScrollDriver(Stage *stageIn, double overScrollRatioX, double overScrollRatioY) {
+    stage = stageIn;
+    player = (SmartSprite*)stage->getOfType(PLAYER)[0];
+
     collisionHandlers.clear();
     exemptTypes.clear();
 
     renderH = stageIn->h;
     renderW = stageIn->w;
 
-    defaultX = renderW / 2;
-    defaultY = renderH / 2;
+    defaultX = (renderW / 2) - (player->W() / 2);
+    defaultY = (renderH / 2) - (player->H() / 2);
 
     maxX = 0;
     maxY = 0;
@@ -61,11 +64,8 @@ ScrollDriver::ScrollDriver(Stage *stageIn, double overScrollRatioX, double overS
     minY = renderH * -overScrollRatioY;
 
     xInc = yInc = 1;
-    stage = stageIn;
     xOffset = yOffset = 0;
     
-    player = (SmartSprite*)stage->getOfType(PLAYER)[0];
-
     collisionHandlers[WALL] = hitWall;
     collisionHandlers[ROOF] = hitRoof;
     collisionHandlers[FLOOR] = hitFloor;
@@ -110,7 +110,6 @@ void ScrollDriver::handle() {
     }
 
     if (xChange == 0 && yChange == 0) return;
-
 
     // Increment all positions
     xOffset += xChange;

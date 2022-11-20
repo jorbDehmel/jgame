@@ -1,58 +1,58 @@
 #ifndef KEYS_H
 #define KEYS_H
 
-#define cuint8 const unsigned char
-
 // Key encodings for use with the KEYS global variable.
 // Use like this: if (KEYS[keys::esc]) {...}
 namespace keys {
-    cuint8 esc = 27;
-    cuint8 enter = 13;
+    int esc = 27;
+    int enter = 13;
 
-    cuint8 a = 'a';
-    cuint8 b = 'b';
-    cuint8 c = 'c';
-    cuint8 d = 'd';
-    cuint8 e = 'e';
-    cuint8 f = 'f';
-    cuint8 g = 'g';
-    cuint8 h = 'h';
-    cuint8 i = 'i';
-    cuint8 j = 'j';
-    cuint8 k = 'k';
-    cuint8 l = 'l';
-    cuint8 m = 'm';
-    cuint8 n = 'n';
-    cuint8 o = 'o';
-    cuint8 p = 'p';
-    cuint8 q = 'q';
-    cuint8 r = 'r';
-    cuint8 s = 's';
-    cuint8 t = 't';
-    cuint8 u = 'u';
-    cuint8 v = 'v';
-    cuint8 w = 'w';
-    cuint8 x = 'x';
-    cuint8 y = 'y';
-    cuint8 z = 'z';
+    int a = 'a';
+    int b = 'b';
+    int c = 'c';
+    int d = 'd';
+    int e = 'e';
+    int f = 'f';
+    int g = 'g';
+    int h = 'h';
+    int i = 'i';
+    int j = 'j';
+    int k = 'k';
+    int l = 'l';
+    int m = 'm';
+    int n = 'n';
+    int o = 'o';
+    int p = 'p';
+    int q = 'q';
+    int r = 'r';
+    int s = 's';
+    int t = 't';
+    int u = 'u';
+    int v = 'v';
+    int w = 'w';
+    int x = 'x';
+    int y = 'y';
+    int z = 'z';
 
-    cuint8 zero = '0';
-    cuint8 one = '1';
-    cuint8 two = '2';
-    cuint8 three = '3';
-    cuint8 four = '4';
-    cuint8 five = '5';
-    cuint8 six = '6';
-    cuint8 seven = '7';
-    cuint8 eight = '8';
-    cuint8 nine = '9';
+    int zero = '0';
+    int one = '1';
+    int two = '2';
+    int three = '3';
+    int four = '4';
+    int five = '5';
+    int six = '6';
+    int seven = '7';
+    int eight = '8';
+    int nine = '9';
 
-    cuint8 space = ' ';
+    int space = ' ';
 
-    cuint8 leftArrow = -1;
-    cuint8 rightArrow = -1;
-    cuint8 upArrow = -1;
-    cuint8 downArrow = -1;
+    int leftArrow = 1073741904;
+    int rightArrow = 1073741903;
+    int upArrow = 1073741906;
+    int downArrow = 1073741905;
+
+    int shift = 1073742053;
 }
 
 #endif
