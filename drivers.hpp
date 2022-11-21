@@ -45,6 +45,7 @@ public:
 
 //////////////////////////////////////////////////
 
+// Initialize driver
 ScrollDriver::ScrollDriver(Stage *stageIn, double overScrollRatioX, double overScrollRatioY) {
     stage = stageIn;
     player = (SmartSprite*)stage->getOfType(PLAYER)[0];
@@ -79,6 +80,7 @@ ScrollDriver::ScrollDriver(Stage *stageIn, double overScrollRatioX, double overS
     return;
 }
 
+// Update positions
 void ScrollDriver::handle() {
     i8 xChange = 0, yChange = 0;
     
@@ -124,6 +126,8 @@ void ScrollDriver::handle() {
     return;
 }
 
+// Associate a given function with a sprite type. This function will be called
+// upon player collision with a sprite of type t.
 void ScrollDriver::associate(SPRITE_TYPE t, void (*func)(Sprite*, Sprite*)) {
     collisionHandlers[t] = func;
     return;
