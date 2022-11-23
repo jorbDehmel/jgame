@@ -80,21 +80,21 @@ void ScrollDriver::handle() {
     i8 xChange = 0, yChange = 0;
     
     // Handle movement events
-    if (KEYS['w']) {
+    if (KEYS['w'] || KEYS[keys::upArrow]) {
         if (player->Y() > defaultY) player->yInc(-yInc);
         else if (yOffset < maxY) yChange += yInc;
         else if (player->Y() > 0) player->yInc(-yInc);
-    } else if (KEYS['s']) {
+    } else if (KEYS['s'] || KEYS[keys::downArrow]) {
         if (player->Y() < defaultY) player->yInc(yInc);
         else if (yOffset > minY) yChange -= yInc;
         else if (player->Y() + player->H() < renderH) player->yInc(yInc);
     }
 
-    if (KEYS['d']) {
+    if (KEYS['d'] || KEYS[keys::rightArrow]) {
         if (player->X() < defaultX) player->xInc(xInc);
         else if (xOffset > minX) xChange -= xInc;
         else if (player->X() + player->W() < renderW) player->xInc(xInc);
-    } else if (KEYS['a']) {
+    } else if (KEYS['a'] || KEYS[keys::leftArrow]) {
         if (player->X() > defaultX) player->xInc(-xInc);
         else if (xOffset < maxX) xChange += xInc;
         else if (player->X() > 0) player->xInc(-xInc);
