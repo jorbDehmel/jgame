@@ -1,7 +1,7 @@
 jgame
 
 (Jordan "Jorb" Dehmel, 2022, jdehmel@outlook.com)
-A simple game/graphical interface built on top of SDL.
+A simple game building interface built on top of SDL.
 
 
 
@@ -15,6 +15,12 @@ screen every time it is updated. This function takes the
 form void update(Surface *frameToUpdate). It also takes
 width, height, and refresh time (in milliseconds to wait
 per frame).
+
+    Note: The refresh time represents the minimum time
+that a frame update will take. The actual elapsed time
+may exceed this if the CPU is experiencing a high work
+load or if the calculations for the game are taking
+longer than the wait time.
 
 
 
@@ -71,6 +77,7 @@ Example:
 
     closeAudio();
     SDL_Quit();
+
 
 
 Game drivers
@@ -199,9 +206,14 @@ texture path, with the result being w by h), DIRECT
 or FOLDER (load frameNum textures from the following
 single folder).
 
+    Note: It is not required that a level file be named
+"level", and it is only required that it contains
+standard text encoding of this format. The actual file
+extension doesn't matter.
 
 
-License
+
+License (via MIT)
 
 Copyright © 2022 Jordan Dehmel
 
