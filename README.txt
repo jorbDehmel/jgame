@@ -1,7 +1,18 @@
 jgame
 
 (Jordan "Jorb" Dehmel, 2022, jdehmel@outlook.com)
-A simple game building interface built on top of SDL.
+A simple C++ game building library built on top of SDL.
+
+
+
+Installation:
+
+    No matter the operating system, you MUST install
+the SDL2 library for C. If you are using an Ubuntu
+Linux-based OS, you can run `make install` in this
+folder to add this library to your includepath. If
+you are using Windows, Arch-based-Linux or MacOS, just
+install SDL2 and add this folder to your PATH variable.
 
 
 

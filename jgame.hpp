@@ -1,6 +1,14 @@
 #ifndef JGAME_H
 #define JGAME_H
 
+// Dependancies
+#include <iostream>
+#include <fstream>
+#include <set>
+#include <cassert>
+#include <cmath>
+#include <SDL2/SDL.h>
+
 // Add this to your compilation command:
 // `sdl2-config --cflags --libs`
 

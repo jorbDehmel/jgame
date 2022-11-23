@@ -2,11 +2,12 @@
 #define WINDOW_H
 
 #include <SDL2/SDL.h>
-#include <stdexcept>
-#include <set>
-#include <bitset>
 
-#include <iostream>
+//#include <stdexcept>
+
+//#include <set>
+//#include <bitset>
+//#include <iostream>
 
 /////////////////////////////////////
 
