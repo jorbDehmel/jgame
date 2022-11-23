@@ -1,16 +1,8 @@
-#include "jgame.hpp"
-#include "audio.hpp"
-
-#include <fstream>
-#include <regex>
-#include <string>
-
-#include <iostream>
-
-using namespace std;
-
 #ifndef LEVELSTAGE_H
 #define LEVELSTAGE_H
+
+#include "jgame.hpp"
+#include "audio.hpp"
 
 /////////////////////////////////////
 

@@ -1,12 +1,7 @@
 #ifndef STAGE_H
 #define STAGE_H
 
-#include "window.hpp"
-#include "audio.hpp"
-#include <fstream>
-#include <vector>
-
-#include <iostream>
+#include "jgame.hpp"
 
 /////////////////////////////////////
 

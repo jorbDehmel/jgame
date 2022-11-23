@@ -1,9 +1,7 @@
 #ifndef TEXTURES_H
 #define TEXTURES_H
 
-#include <cassert>
-#include "stage.hpp"
-#include <regex>
+#include "jgame.hpp"
 
 /////////////////////////////////////
 
