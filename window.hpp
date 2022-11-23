@@ -108,6 +108,9 @@ public:
 
     SDL_Window *window;
     SDL_Event event;
+
+    u32 prevTicks;
+    i16 toWait;
 };
 
 /////////////////////////////////////
@@ -189,10 +192,15 @@ void Window::scanEvents() {
 // Call the (given at instantiation) update frame function and delay by 
 // the pre-given refresh time.
 void Window::runFrame() {
+    prevTicks = SDL_GetTicks();
+
     update(SDL_GetWindowSurface(window));
     SDL_UpdateWindowSurface(window);
 
-    SDL_Delay(REFRESH_TIME);
+    toWait = SDL_GetTicks() - prevTicks;
+    if (REFRESH_TIME - toWait > 0) {
+        SDL_Delay(REFRESH_TIME - toWait);
+    }
 
     return;
 }
