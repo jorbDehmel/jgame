@@ -7,6 +7,11 @@
 
 // Copy a char* into another safely
 void copy_chararr(char *a, char *b) {
+    if (a == nullptr) {
+        b = nullptr;
+        return;
+    }
+    if (b != nullptr) delete [] b;
     int size = 0; while (a[size] != '\0') size++;
     b = new char[size + 1]; b[size] = '\0';
     for (int i = 0; i < size; i++) b[i] = a[i];
@@ -197,6 +202,11 @@ Stage::Stage(u16 height, u16 width, u8 depth) {
 // Update a passed frame so that it contains the stage's image
 // (with all sprites rendered from furthest away to closest, layer 0 through infinity)
 void Stage::update(SDL_Surface *frame) {
+    if (frame->w != w || frame->h != h) {
+        cout << frame->w << '\t' << w << '\t' << frame->h << '\t' << h << '\n';
+        throw runtime_error("Stage cannot update a frame of a different size");
+    }
+
     SDL_LockSurface(frame);
 
     pixels = (PIXEL_TYPE*)frame->pixels;
