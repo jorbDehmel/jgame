@@ -1,7 +1,7 @@
 #ifndef SMARTSPRITE_H
 #define SMARTSPRITE_H
 
-#include "textures.hpp"
+#include "jgame.hpp"
 
 /////////////////////////////////////
 
@@ -132,8 +132,12 @@ SmartSprite::SmartSprite(u8 numF, Surface **s, int x, int y, u8 l, SPRITE_TYPE t
 
     rect.x = x;
     rect.y = y;
+
     layer = l;
     this->surface = frames[curFrame];
+
+    rect.w = surface->w;
+    rect.h = surface->h;
 }
 
 // Initialize a smartSprite from a folder path and a number of frames to load.
@@ -166,8 +170,11 @@ SmartSprite::SmartSprite(u8 numF, char *folder, int x, int y, u8 l, u8 scale, SP
 
     rect.x = x;
     rect.y = y;
-    layer = l;
+    this->layer = l;
     this->surface = frames[curFrame];
+
+    rect.w = surface->w;
+    rect.h = surface->h;
 }
 
 // Gracefully deallocate all associated memory

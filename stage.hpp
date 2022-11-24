@@ -160,8 +160,8 @@ public:
     std::vector<Sprite *> getTouching(Sprite *s) const;
     std::vector<Sprite *> getAllTouching(Sprite *s) const;
     std::vector<Sprite *> getOfType(SPRITE_TYPE t) const;
-
     std::vector<Sprite *> getOfType() const;
+    
     void playSound(char *name);
 
     SpriteNode *SPRITES;
@@ -186,14 +186,23 @@ Stage::Stage(u16 height, u16 width) {
 // Update a passed frame so that it contains the stage's image
 // (with all sprites rendered from furthest away to closest, layer 0 through infinity)
 void Stage::update(SDL_Surface *frame) {
-    // Iterate over sprites (from largest to smallest layer)
     Sprite *sprite;
+    SDL_Rect temp;
     for (SpriteNode *current = SPRITES; current != nullptr; current = current->next) {
         sprite = current->cur;
 
-        if (sprite->rect.x < -sprite->surface->w || sprite->rect.y < -sprite->surface->h) continue;
+        // IMPORTANT NOTE:
+        // this temp var is needed because SDL_BlitSurface messes
+        // up the data stored in the rects it is passed.
+        // DO NOT REMOVE THIS TEMP VAR, it is EXTREMELY NEEDED
+        temp.x = sprite->rect.x; 
+        temp.y = sprite->rect.y; 
+        temp.w = sprite->rect.w; 
+        temp.h = sprite->rect.h;
 
-        SDL_BlitSurface(sprite->surface, NULL, frame, &sprite->rect);
+        if (sprite->rect.x < -sprite->rect.w || sprite->rect.y < -sprite->rect.h) continue;
+
+        SDL_BlitSurface(sprite->surface, NULL, frame, &temp);
     }
 
     return;

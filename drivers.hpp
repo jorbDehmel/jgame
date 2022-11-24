@@ -10,10 +10,10 @@
 // Default collision handlers
 void hitWall(Sprite *player, Sprite *wall) {}
 void hitRoof(Sprite *player, Sprite *roof) {}
-void hitFloor(Sprite *player, Sprite *wall) {}
-void hitBlock(Sprite *player, Sprite *roof) {}
-void hitEnemy(Sprite *player, Sprite *wall) {}
-void hitItem(Sprite *player, Sprite *roof) {}
+void hitFloor(Sprite *player, Sprite *floor) {}
+void hitBlock(Sprite *player, Sprite *block) {}
+void hitEnemy(Sprite *player, Sprite *enemy) {}
+void hitItem(Sprite *player, Sprite *item) {}
 
 //////////////////////////////////////////////////
 
@@ -25,7 +25,7 @@ public:
     void handle();
     void associate(SPRITE_TYPE t, void (*func)(Sprite*, Sprite*));
 
-    u16 renderH, renderW;
+    i16 renderH, renderW;
     i16 defaultX, defaultY;
     i16 maxX, maxY, minX, minY;
     SmartSprite *player;
@@ -44,6 +44,7 @@ public:
 ScrollDriver::ScrollDriver(Stage *stageIn, double overScrollRatioX, double overScrollRatioY) {
     stage = stageIn;
     player = (SmartSprite*)stage->getOfType(PLAYER)[0];
+    assert(player);
 
     collisionHandlers.clear();
     exemptTypes.clear();
@@ -107,17 +108,16 @@ void ScrollDriver::handle() {
     }
 
     if (xChange == 0 && yChange == 0) return;
-    
+
     // Increment all positions
     xOffset += xChange;
     yOffset += yChange;
     for (auto i: stage->getOfType()) {
-        cout << "Type: " << i->type << "\tx: " << i->rect.x << "\ty: " << i->rect.y << '\n';
         if (exemptTypes.find(i->type) == exemptTypes.end()) {
-            ((SmartSprite*)i)->xInc(xChange);
-            ((SmartSprite*)i)->yInc(yChange);
+            i->rect.x += xChange;
+            i->rect.y += yChange;
         }
-    } cout << "\n";
+    }
 
     return;
 }

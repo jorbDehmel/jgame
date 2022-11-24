@@ -110,7 +110,7 @@ void loadFileToStage(ifstream *loader, Stage *stage) {
 
                 Surface *from = loadTexture(path.c_str(), 1);
 
-                Surface *onto = SDL_CreateRGBSurface(0, stage->w * scaleA, stage->w * scaleB, BITDEPTH, 0, 0, 0, 0);
+                Surface *onto = SDL_CreateRGBSurface(0, stage->w * scaleA, stage->h * scaleB, BITDEPTH, 0, 0, 0, 0);
                 
                 tile(from, onto);
                 toAdd = new SmartSprite(1, &onto, stage->w * x, stage->h * y, layer, tag);
@@ -146,8 +146,7 @@ public:
     u8 level() const;
     char *levelName() const;
     void level(u8 toLoadNumber);
-    void level(char *toLoadName);
-
+    
     vector<Sprite *> getTouching(Sprite *s) const;
     vector<Sprite *> getAllTouching(Sprite *s) const;
     vector<Sprite *> getOfType(SPRITE_TYPE t) const;
@@ -203,6 +202,7 @@ LevelStage::~LevelStage() {
 
 // Render all sprites currently in frame and in memory to the passed frame
 void LevelStage::update(Surface *frame) {
+    assert(frame->w == stage->w && frame->h == stage->h);
     stage->update(frame);
     return;
 }
@@ -246,21 +246,6 @@ void LevelStage::level(u8 toLoadNumber) {
     } else {
         throw runtime_error("Invalid level index");
     }
-    return;
-}
-
-// Load a given level by name
-void LevelStage::level(char *toLoadName) {
-    for (int i = 0; i < numLevels; i++) {
-        if (levelPaths[i] == toLoadName) {
-            loader.open(levelPaths[i]);
-            loadFileToStage(&loader, stage);
-            loader.close();
-            return;
-        }
-    }
-    throw runtime_error("Invalid level name");
-    
     return;
 }
 

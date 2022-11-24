@@ -146,8 +146,6 @@ Window::Window(u16 h, u16 w, u16 rt, char *t, void (*updateFunc)(SDL_Surface *fr
         throw std::runtime_error("Could not create window");
     }
 
-    SDL_SetSurfaceRLE(SDL_GetWindowSurface(window), 1);
-
     return;
 }
 
@@ -158,7 +156,6 @@ void Window::scanEvents() {
     while (SDL_PollEvent(&event)) {
         switch(event.type) {
             case SDL_KEYDOWN:
-                //std::cout << (int)event.key.keysym.sym << '\n';
                 KEYS.insert((int)event.key.keysym.sym);
                 break;
             case SDL_KEYUP:
