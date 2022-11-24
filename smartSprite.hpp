@@ -69,19 +69,19 @@ public:
 
     ~SmartSprite();
 
-    inline int X() const { return *x; }
-    inline int Y() const { return *y; }
-    inline void X(int t) { *x = t; }
-    inline void Y(int t) { *y = t; }
-    inline u8 L() const { return *layer; }
-    inline void L(int t) { if (t > 0) *layer = t; }
+    inline int x() const { return this->rect.x; }
+    inline int y() const { return this->rect.y; }
+    inline void x(int t) { this->rect.x = t; }
+    inline void y(int t) { this->rect.y = t; }
+    inline u8 l() const { return this->layer; }
+    inline void l(int t) { if (t > 0) this->layer = t; }
 
-    inline int W() const { return surface->w; }
-    inline int H() const { return surface->h; }
+    inline int w() const { return this->surface->w; }
+    inline int h() const { return this->surface->h; }
 
-    inline void xInc(int t = 1) { (*x) += t; }
-    inline void yInc(int t = 1) { (*y) += t; }
-    inline void lInc(int t = 1) { (*layer) += t; }
+    inline void xInc(int t = 1) { this->rect.x += t; }
+    inline void yInc(int t = 1) { this->rect.y += t; }
+    inline void lInc(int t = 1) { this->layer += t; }
 
     inline int frame() const { return curFrame; };
     inline void frame(int t) {
@@ -130,9 +130,9 @@ SmartSprite::SmartSprite(u8 numF, Surface **s, int x, int y, u8 l, SPRITE_TYPE t
     curFrame = 0;
     type = t;
 
-    this->x = new int(x);
-    this->y = new int(y);
-    this->layer = new u8(l);
+    rect.x = x;
+    rect.y = y;
+    layer = l;
     this->surface = frames[curFrame];
 }
 
@@ -164,16 +164,14 @@ SmartSprite::SmartSprite(u8 numF, char *folder, int x, int y, u8 l, u8 scale, SP
     curFrame = 0;
     type = t;
 
-    this->x = new int(x);
-    this->y = new int(y);
-    this->layer = new u8(l);
+    rect.x = x;
+    rect.y = y;
+    layer = l;
     this->surface = frames[curFrame];
 }
 
 // Gracefully deallocate all associated memory
 SmartSprite::~SmartSprite() {
-    delete x;
-    delete y;
     delete [] frames;
 }
 

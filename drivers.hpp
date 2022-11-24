@@ -51,8 +51,8 @@ ScrollDriver::ScrollDriver(Stage *stageIn, double overScrollRatioX, double overS
     renderH = stageIn->h;
     renderW = stageIn->w;
 
-    defaultX = (renderW / 2) - (player->W() / 2);
-    defaultY = (renderH / 2) - (player->H() / 2);
+    defaultX = (renderW / 2) - (player->w() / 2);
+    defaultY = (renderH / 2) - (player->h() / 2);
 
     maxX = 0;
     maxY = 0;
@@ -81,23 +81,23 @@ void ScrollDriver::handle() {
     
     // Handle movement events
     if (KEYS['w'] || KEYS[keys::upArrow]) {
-        if (player->Y() > defaultY) player->yInc(-yInc);
+        if (player->y() > defaultY) player->yInc(-yInc);
         else if (yOffset < maxY) yChange += yInc;
-        else if (player->Y() > 0) player->yInc(-yInc);
+        else if (player->y() > 0) player->yInc(-yInc);
     } else if (KEYS['s'] || KEYS[keys::downArrow]) {
-        if (player->Y() < defaultY) player->yInc(yInc);
+        if (player->y() < defaultY) player->yInc(yInc);
         else if (yOffset > minY) yChange -= yInc;
-        else if (player->Y() + player->H() < renderH) player->yInc(yInc);
+        else if (player->y() + player->h() < renderH) player->yInc(yInc);
     }
 
     if (KEYS['d'] || KEYS[keys::rightArrow]) {
-        if (player->X() < defaultX) player->xInc(xInc);
+        if (player->x() < defaultX) player->xInc(xInc);
         else if (xOffset > minX) xChange -= xInc;
-        else if (player->X() + player->W() < renderW) player->xInc(xInc);
+        else if (player->x() + player->w() < renderW) player->xInc(xInc);
     } else if (KEYS['a'] || KEYS[keys::leftArrow]) {
-        if (player->X() > defaultX) player->xInc(-xInc);
+        if (player->x() > defaultX) player->xInc(-xInc);
         else if (xOffset < maxX) xChange += xInc;
-        else if (player->X() > 0) player->xInc(-xInc);
+        else if (player->x() > 0) player->xInc(-xInc);
     }
 
     for (auto c : stage->getAllTouching(player)) {
@@ -107,16 +107,17 @@ void ScrollDriver::handle() {
     }
 
     if (xChange == 0 && yChange == 0) return;
-
+    
     // Increment all positions
     xOffset += xChange;
     yOffset += yChange;
     for (auto i: stage->getOfType()) {
+        cout << "Type: " << i->type << "\tx: " << i->rect.x << "\ty: " << i->rect.y << '\n';
         if (exemptTypes.find(i->type) == exemptTypes.end()) {
-            *(i->x) += xChange;
-            *(i->y) += yChange;
+            ((SmartSprite*)i)->xInc(xChange);
+            ((SmartSprite*)i)->yInc(yChange);
         }
-    }
+    } cout << "\n";
 
     return;
 }

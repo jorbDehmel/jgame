@@ -68,9 +68,9 @@ void write(SmartSprite *font, char *what, Surface *where, u16 returnX, bool firs
         stamp(font, where);
         break;
     case '\n':
-        font->yInc(font->H() + 1);
-        font->X(0);
-        font->xInc(-font->W() - 1);
+        font->yInc(font->h() + 1);
+        font->x(0);
+        font->xInc(-font->w() - 1);
         break;
     default:
         font->frame(concat(what[0], (char*)".bmp"));
@@ -78,16 +78,16 @@ void write(SmartSprite *font, char *what, Surface *where, u16 returnX, bool firs
         break;
     }
 
-    font->xInc(font->W() + 1);
-    if (font->X() + font->W() + 1 >= returnX) {
-        font->yInc(font->H() + 1);
-        font->X(0);
+    font->xInc(font->w() + 1);
+    if (font->x() + font->w() + 1 >= returnX) {
+        font->yInc(font->h() + 1);
+        font->x(0);
     }
 
     write(font, &what[1], where, returnX, false);
 
     if (first) {
-        font->X(-font->W());
+        font->x(-font->w());
     }
 
     return;

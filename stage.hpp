@@ -42,15 +42,13 @@ enum SPRITE_TYPE {
 class Sprite {
 public:
     Sprite();
-
-    Sprite(SDL_Surface *s, i32 &xIn, i32 &yIn, u8 &l);
-    Sprite(SDL_Surface *s, u8 l);
+    Sprite(SDL_Surface *s, i32 x = 0, i32 y = 0, u8 l = 0);
     ~Sprite();
 
     SDL_Surface *surface;
 
-    i32 *x, *y;
-    u8 *layer;
+    SDL_Rect rect;
+    u8 layer;
 
     SPRITE_TYPE type;
 };
@@ -58,33 +56,26 @@ public:
 // Default constructor for inherited classes (DO NOT USE)
 Sprite::Sprite() {
     surface = nullptr;
-    x = y = nullptr;
-    layer = nullptr;
+    layer = 0;
 }
 
 // Construct a Sprite given a surface (costume) and variables
 // to be associated with x, y, and layer.
-Sprite::Sprite(SDL_Surface *s, i32 &xIn, i32 &yIn, u8 &l) {
+Sprite::Sprite(SDL_Surface *s, i32 x, i32 y, u8 l) {
     surface = s;
-    x = &xIn;
-    y = &yIn;
-    layer = &l;
-}
+    layer = l;
+    
+    rect.x = x;
+    rect.y = y;
+    rect.w = surface->w;
+    rect.h = surface->h;
 
-// Construct a Sprite given a costume and a layer.
-// Variable references are generated within.
-Sprite::Sprite(SDL_Surface *s, u8 l) {
-    surface = s;
-    x = new i32(0);
-    y = new i32(0);
-    layer = new u8(l);
+    return;
 }
 
 // Dealloc associated memory
 Sprite::~Sprite() {
-    delete x;
-    delete y;
-    delete layer;
+    SDL_FreeSurface(surface);
 }
 
 /////////////////////////////////////
@@ -112,33 +103,33 @@ protected:
 
 // Get analytics on the collisions of sprites a and b
 // (can be easily interpretted using the collision type)
-std::bitset<8> isTouching(Sprite *a, Sprite *b) {
+Collision isTouching(Sprite *a, Sprite *b) {
     std::bitset<8> output;
 
-    output[0] = *a->x + a->surface->w >= *b->x && *a->x + a->surface->w <= *b->x + b->surface->w;
-    output[1] = *a->y + a->surface->h >= *b->y && *a->y + a->surface->h <= *b->y + b->surface->h;
-    output[2] = *a->x >= *b->x && *a->x <= *b->x + b->surface->w;
-    output[3] = *a->y >= *b->y && *a->y <= *b->y + b->surface->h;
+    output[0] = a->rect.x + a->surface->w >= b->rect.x && a->rect.x + a->surface->w <= b->rect.x + b->surface->w;
+    output[1] = a->rect.y + a->surface->h >= b->rect.y && a->rect.y + a->surface->h <= b->rect.y + b->surface->h;
+    output[2] = a->rect.x >= b->rect.x && a->rect.x <= b->rect.x + b->surface->w;
+    output[3] = a->rect.y >= b->rect.y && a->rect.y <= b->rect.y + b->surface->h;
     output[4] = output[3] && (output[0] || output[2]);
     output[5] = output[0] && (output[1] || output[3]);
     output[6] = output[1] && (output[0] || output[2]);
     output[7] = output[2] && (output[1] || output[3]);
 
-    return output;
+    return Collision(output);
 }
 
 // Return if a's bounding rectangle collides with b's.
 bool isTouchingVague(Sprite *a, Sprite *b) {
     auto result = isTouching(a, b);
-    return result[4] || result[5] || result[6] || result[7];
+    return result.top() || result.bottom() || result.right() || result.left();
 }
 
 /////////////////////////////////////
 
 // Return if the mouse falls within an object's bounding rectangle
 bool isMouseWithin(Sprite *a) {
-    return (MOUSE_X >= *a->x && MOUSE_X < *a->x + a->surface->w) &&
-        (MOUSE_Y >= *a->y && MOUSE_Y < *a->y + a->surface->h);
+    return (MOUSE_X >= a->rect.x && MOUSE_X < a->rect.x + a->surface->w) &&
+        (MOUSE_Y >= a->rect.y && MOUSE_Y < a->rect.y + a->surface->h);
 }
 
 /////////////////////////////////////
@@ -158,7 +149,7 @@ struct SpriteNode {
 // when update is called.
 class Stage {
 public:
-    Stage(u16 height, u16 width, u8 depth = 1);
+    Stage(u16 height, u16 width);
 
     void update(SDL_Surface *frame);
 
@@ -175,26 +166,19 @@ public:
 
     SpriteNode *SPRITES;
     std::vector<WAV> sounds;
-
-    // height, width, depth
-    u16 h, w;
-
-    /////////////Temps////////////
-    PIXEL_TYPE *pixels;
-    PIXEL_TYPE *sourcePixels;
-
-    Sprite *sprite;
-    unsigned int source, destination;
+    
+    u16 h;
+    u16 w;
 };
 
 /////////////////////////////////////
 
-// Create an empty stage with the given height, width and depth (depth is depreciated).
-Stage::Stage(u16 height, u16 width, u8 depth) {
+// Create an empty stage.
+Stage::Stage(u16 height, u16 width) {
     SPRITES = nullptr;
+    sounds.clear();
     h = height;
     w = width;
-    sounds.clear();
 
     return;
 }
@@ -202,45 +186,15 @@ Stage::Stage(u16 height, u16 width, u8 depth) {
 // Update a passed frame so that it contains the stage's image
 // (with all sprites rendered from furthest away to closest, layer 0 through infinity)
 void Stage::update(SDL_Surface *frame) {
-    if (frame->w != w || frame->h != h) {
-        cout << frame->w << '\t' << w << '\t' << frame->h << '\t' << h << '\n';
-        throw runtime_error("Stage cannot update a frame of a different size");
-    }
-
-    SDL_LockSurface(frame);
-
-    pixels = (PIXEL_TYPE*)frame->pixels;
-
     // Iterate over sprites (from largest to smallest layer)
+    Sprite *sprite;
     for (SpriteNode *current = SPRITES; current != nullptr; current = current->next) {
         sprite = current->cur;
 
-        if (*sprite->x < 0 - sprite->surface->w || *sprite->y < 0 - sprite->surface->h) continue;
+        if (sprite->rect.x < -sprite->surface->w || sprite->rect.y < -sprite->surface->h) continue;
 
-        sourcePixels = (PIXEL_TYPE*)sprite->surface->pixels;
-        
-        // Place pixels in their correct positions
-        for (int r = 0; r < sprite->surface->h; r++) {
-            for (int c = 0; c < sprite->surface->w; c++) {
-
-                // Determine where from and where to
-                source = (r * sprite->surface->w) + c;
-                destination = ((r + *sprite->y) * frame->w) + c + *sprite->x;
-
-                if (c + *sprite->x + 1 > frame->w || c + *sprite->x < 0) continue;
-
-                //if (!sprite->GO_OFFSCREEN) destination %= h * w;
-
-                // Ignore if out of bounds
-                if (destination >= 0 && destination < h * w) {
-                    // Place pixel (skipping transparency)
-                    if (sourcePixels[source] != 0) pixels[destination] = sourcePixels[source];
-                }
-            }
-        }
+        SDL_BlitSurface(sprite->surface, NULL, frame, &sprite->rect);
     }
-
-    SDL_UnlockSurface(frame);
 
     return;
 }
@@ -257,7 +211,7 @@ void Stage::addSprite(Sprite *s, char *name) {
     } else {
         SpriteNode *prev = nullptr;
         SpriteNode *cursor = SPRITES;
-        while (cursor != nullptr && *cursor->cur->layer < *s->layer) {
+        while (cursor != nullptr && cursor->cur->layer < s->layer) {
             prev = cursor;
             cursor = cursor->next;
         }

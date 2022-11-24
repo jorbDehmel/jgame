@@ -19,9 +19,16 @@ void upScale(SDL_Surface *&s, Uint8 scale) {
 void loadTexture(Sprite *s, const char *path, int scale = 1) {
     if (std::regex_match(path, std::regex(".*\\.bmp"))) {
         SDL_Surface *out = SDL_LoadBMP(path);
-        if (out == nullptr) throw std::runtime_error("Unable to load texture");
+        
+        if (out == nullptr) {
+            throw std::runtime_error("Unable to load texture");
+        }
+        
         upScale(out, scale);
         s->surface = out;
+
+        s->rect.w = s->surface->w;
+        s->rect.h = s->surface->h;
     } else {
         throw std::runtime_error("Unrecognized filetype; cannot load texture");
     }
@@ -98,9 +105,9 @@ void stamp(Sprite *sprite, SDL_Surface *onto) {
 
             // Determine where from and where to
             source = (r * sprite->surface->w) + c;
-            destination = ((r + *sprite->y) * onto->w) + c + *sprite->x;
+            destination = ((r + sprite->rect.y) * onto->w) + c + sprite->rect.x;
 
-            if (c + *sprite->x + 1 > onto->w || c + *sprite->x < 0) continue;
+            if (c + sprite->rect.x + 1 > onto->w || c + sprite->rect.x < 0) continue;
 
             // Ignore if out of bounds
             if (destination > 0 && destination < onto->h * onto->w) {
@@ -119,7 +126,7 @@ void invertX(SDL_Surface *s) {
     PIXEL_TYPE temp, *pixels;
     pixels = (PIXEL_TYPE*)s->pixels;
     for (int y = 0; y < s->h; y++) {
-        for (int x = 0; x < (s->w - x); x++) {
+        for (int x = 0; x <= (s->w - x); x++) {
             temp = pixels[(y * s->w) + x];
             pixels[(y * s->w) + x] = pixels[(y * s->w) + (s->w - x)];
             pixels[(y * s->w) + (s->w - x)] = temp;
