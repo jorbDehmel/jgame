@@ -7,18 +7,22 @@
 /////////////////////////////////////
 
 // Safely extract string data into a char*
-ifstream &operator >> (ifstream& stream, char *&into) {
+ifstream &operator>>(ifstream &stream, char *&into)
+{
     string temp = "#";
-    
-    while (temp[0] == '#' || temp.empty()) {
+
+    while (temp[0] == '#' || temp.empty())
+    {
         stream >> temp;
     }
 
     // Convert string temp to new char* in into
     into = new char[temp.size() + 1];
-    for (int i = 0; i < temp.size(); i++) {
+    for (int i = 0; i < temp.size(); i++)
+    {
         into[i] = temp[i];
-    } into[temp.size()] = '\0';
+    }
+    into[temp.size()] = '\0';
 
     return stream;
 }
@@ -27,13 +31,17 @@ ifstream &operator >> (ifstream& stream, char *&into) {
 name x y layer spriteTag scale numFrames frameTag
 <frames/folder>
 */
-void loadFileToStage(ifstream *loader, Stage *stage) {
-    if (loader->is_open()) {
+void loadFileToStage(ifstream *loader, Stage *stage)
+{
+    if (loader->is_open())
+    {
         // Empty old data
-        while (stage->SPRITES != nullptr) {
+        while (stage->SPRITES != nullptr)
+        {
             stage->removeSprite(stage->SPRITES->cur);
         }
-        for (WAV sound : stage->sounds) {
+        for (WAV sound : stage->sounds)
+        {
             SDL_FreeWAV(sound.wavBuffer);
         }
         stage->sounds.clear();
@@ -43,45 +51,70 @@ void loadFileToStage(ifstream *loader, Stage *stage) {
         string temp;
         WAV wavTemp;
         *loader >> numSounds;
-        for (int i = 0; i < numSounds; i++) {
+        for (int i = 0; i < numSounds; i++)
+        {
             *loader >> temp;
-            loadWAV((char*)temp.c_str(), &wavTemp);
+            loadWAV((char *)temp.c_str(), &wavTemp);
             stage->sounds.push_back(wavTemp);
         }
 
         // Load sprites
-        while (!loader->eof()) {
-            string name, spriteTag, frameTag; 
+        while (!loader->eof())
+        {
+            string name, spriteTag, frameTag;
             int layer, numFrames;
             double scaleA, scaleB, x, y;
-            
-            *loader >> name >> x >> y >> layer >> spriteTag >> 
+
+            *loader >> name >> x >> y >> layer >> spriteTag >>
                 scaleA >> scaleB >> numFrames >> frameTag;
 
             SPRITE_TYPE tag;
-            if (spriteTag == "BACKGROUND") {
+            if (spriteTag == "BACKGROUND")
+            {
                 tag = BACKGROUND;
-            } else if (spriteTag == "BLOCK") {
+            }
+            else if (spriteTag == "BLOCK")
+            {
                 tag = BLOCK;
-            } else if (spriteTag == "DECORE") {
+            }
+            else if (spriteTag == "DECORE")
+            {
                 tag = DECORE;
-            } else if (spriteTag == "ENEMY") {
+            }
+            else if (spriteTag == "ENEMY")
+            {
                 tag = ENEMY;
-            } else if (spriteTag == "FLOOR") {
+            }
+            else if (spriteTag == "FLOOR")
+            {
                 tag = FLOOR;
-            }  else if (spriteTag == "ITEM") {
+            }
+            else if (spriteTag == "ITEM")
+            {
                 tag = ITEM;
-            } else if (spriteTag == "LABEL") {
+            }
+            else if (spriteTag == "LABEL")
+            {
                 tag = LABEL;
-            } else if (spriteTag == "PLAYER") {
+            }
+            else if (spriteTag == "PLAYER")
+            {
                 tag = PLAYER;
-            } else if (spriteTag == "ROOF") {
+            }
+            else if (spriteTag == "ROOF")
+            {
                 tag = ROOF;
-            } else if (spriteTag == "WALL") {
+            }
+            else if (spriteTag == "WALL")
+            {
                 tag = WALL;
-            } else if (spriteTag == "NPC") {
+            }
+            else if (spriteTag == "NPC")
+            {
                 tag = NPC;
-            } else {
+            }
+            else
+            {
                 throw runtime_error("Invalid sprite tag '" + spriteTag + "'");
             }
 
@@ -89,9 +122,11 @@ void loadFileToStage(ifstream *loader, Stage *stage) {
             string path;
 
             // Load from paths
-            if (frameTag == "DIRECT") {
-                Surface **frames = new Surface*[numFrames];
-                for (int i = 0; i < numFrames; i++) {
+            if (frameTag == "DIRECT")
+            {
+                Surface **frames = new Surface *[numFrames];
+                for (int i = 0; i < numFrames; i++)
+                {
                     *loader >> path;
                     frames[i] = loadTexture(path.c_str(), stage->w * scaleA);
                 }
@@ -99,30 +134,40 @@ void loadFileToStage(ifstream *loader, Stage *stage) {
             }
 
             // Load from a folder
-            else if (frameTag == "FOLDER") {
+            else if (frameTag == "FOLDER")
+            {
                 *loader >> path;
-                toAdd = new SmartSprite(numFrames, (char*)path.c_str(), stage->w * x, stage->h * y, layer, stage->w * scaleA, tag);
+                toAdd = new SmartSprite(numFrames, (char *)path.c_str(), stage->w * x, stage->h * y, layer, stage->w * scaleA, tag);
             }
 
             // Load from 1 path, using tiling
-            else if (frameTag == "TILE") {
+            else if (frameTag == "TILE")
+            {
                 *loader >> path;
 
                 Surface *from = loadTexture(path.c_str(), 1);
 
                 Surface *onto = SDL_CreateRGBSurface(0, stage->w * scaleA, stage->h * scaleB, BITDEPTH, 0, 0, 0, 0);
-                
+
                 tile(from, onto);
                 toAdd = new SmartSprite(1, &onto, stage->w * x, stage->h * y, layer, tag);
             }
-            
-            else {
+
+            else
+            {
                 throw runtime_error("Invalid frame tag (must be DIRECT or FOLDER)");
             }
 
-            stage->addSprite(toAdd, (char*)name.c_str());
+            stage->addSprite(toAdd, (char *)name.c_str());
+
+            while (loader->peek() == '\n')
+            {
+                loader->ignore(1);
+            }
         }
-    } else {
+    }
+    else
+    {
         throw runtime_error("Invalid level path");
     }
 
@@ -132,7 +177,8 @@ void loadFileToStage(ifstream *loader, Stage *stage) {
 /////////////////////////////////////
 
 // stage with load-from-file ability
-class LevelStage {
+class LevelStage
+{
 public:
     LevelStage(u16 height, u16 width, char *levelListFile);
     ~LevelStage();
@@ -146,17 +192,17 @@ public:
     u8 level() const;
     char *levelName() const;
     void level(u8 toLoadNumber);
-    
+
     vector<Sprite *> getTouching(Sprite *s) const;
     vector<Sprite *> getAllTouching(Sprite *s) const;
     vector<Sprite *> getOfType(SPRITE_TYPE t) const;
 
     vector<Sprite *> getOfType() const;
     void playSound(char *name) const;
-    
+
     void incLevel(u8 by = 1);
     u16 numLevels;
-    
+
     ifstream loader;
 
     u8 currentLevel;
@@ -167,16 +213,21 @@ public:
 /////////////////////////////////////
 
 // Construct LevelStage given path to list
-LevelStage::LevelStage(u16 height, u16 width, char *levelListFile) {
+LevelStage::LevelStage(u16 height, u16 width, char *levelListFile)
+{
     // Load from levelListFile file
     loader.open(levelListFile);
-    if (loader.is_open()) {
+    if (loader.is_open())
+    {
         loader >> numLevels;
-        levelPaths = new char*[numLevels];
-        for (int i = 0; i < numLevels; i++) {
+        levelPaths = new char *[numLevels];
+        for (int i = 0; i < numLevels; i++)
+        {
             loader >> levelPaths[i];
         }
-    } else {
+    }
+    else
+    {
         throw runtime_error("Could not open levelListFile");
     }
     loader.close();
@@ -191,9 +242,10 @@ LevelStage::LevelStage(u16 height, u16 width, char *levelListFile) {
 }
 
 // Dealloc memory for levelStage
-LevelStage::~LevelStage() {
+LevelStage::~LevelStage()
+{
     delete stage;
-    delete [] levelPaths;
+    delete[] levelPaths;
 
     return;
 }
@@ -201,26 +253,30 @@ LevelStage::~LevelStage() {
 /////////////////////////////////////
 
 // Render all sprites currently in frame and in memory to the passed frame
-void LevelStage::update(Surface *frame) {
+void LevelStage::update(Surface *frame)
+{
     assert(frame->w == stage->w && frame->h == stage->h);
     stage->update(frame);
     return;
 }
 
 // Add a sprite to frame (doesn't modify file)
-void LevelStage::addSprite(Sprite *sprite) {
+void LevelStage::addSprite(Sprite *sprite)
+{
     stage->addSprite(sprite);
     return;
 }
 
 // Remove a sprite form frame by pointer
-void LevelStage::removeSprite(Sprite *sprite) {
+void LevelStage::removeSprite(Sprite *sprite)
+{
     stage->removeSprite(sprite);
     return;
 }
 
 // Remove a sprite from frame by name
-void LevelStage::removeSprite(char *spriteName) {
+void LevelStage::removeSprite(char *spriteName)
+{
     stage->removeSprite(spriteName);
     return;
 }
@@ -228,22 +284,28 @@ void LevelStage::removeSprite(char *spriteName) {
 /////////////////////////////////////
 
 // Get the current level
-u8 LevelStage::level() const {
+u8 LevelStage::level() const
+{
     return currentLevel;
 }
 
 // Get the current level name
-char *LevelStage::levelName() const {
+char *LevelStage::levelName() const
+{
     return levelPaths[currentLevel];
 }
 
 // Load a given level by number
-void LevelStage::level(u8 toLoadNumber) {
-    if (toLoadNumber < numLevels) {
+void LevelStage::level(u8 toLoadNumber)
+{
+    if (toLoadNumber < numLevels)
+    {
         loader.open(levelPaths[toLoadNumber]);
         loadFileToStage(&loader, stage);
         loader.close();
-    } else {
+    }
+    else
+    {
         throw runtime_error("Invalid level index");
     }
     return;
@@ -252,28 +314,33 @@ void LevelStage::level(u8 toLoadNumber) {
 /////////////////////////////////////
 
 // Get all sprites s touches
-vector<Sprite *> LevelStage::getTouching(Sprite *s) const {
+vector<Sprite *> LevelStage::getTouching(Sprite *s) const
+{
     return stage->getTouching(s);
 }
 
 // Get all sprites s touches AND that touch s
-vector<Sprite *> LevelStage::getAllTouching(Sprite *s) const {
+vector<Sprite *> LevelStage::getAllTouching(Sprite *s) const
+{
     return stage->getAllTouching(s);
 }
 
 // Get all sprites of a given type
-vector<Sprite *> LevelStage::getOfType(SPRITE_TYPE t) const {
+vector<Sprite *> LevelStage::getOfType(SPRITE_TYPE t) const
+{
     return stage->getOfType(t);
 }
 
 // Get all sprites
-vector<Sprite *> LevelStage::getOfType() const {
+vector<Sprite *> LevelStage::getOfType() const
+{
     return stage->getOfType();
 }
 
 /////////////////////////////////////
 
-void LevelStage::playSound(char *name) const {
+void LevelStage::playSound(char *name) const
+{
     stage->playSound(name);
     return;
 }
@@ -281,8 +348,10 @@ void LevelStage::playSound(char *name) const {
 /////////////////////////////////////
 
 // Increment the current level by a number
-void LevelStage::incLevel(u8 by) {
-    if (by > 0) {
+void LevelStage::incLevel(u8 by)
+{
+    if (by > 0)
+    {
         currentLevel += by;
         currentLevel %= numLevels;
 
@@ -294,7 +363,9 @@ void LevelStage::incLevel(u8 by) {
         loader.close();
 
         return;
-    } else {
+    }
+    else
+    {
         throw runtime_error("Invalid frame incrementation");
     }
     return;
